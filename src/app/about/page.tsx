@@ -1,0 +1,65 @@
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About | XRCraftMC',
+  description: 'Learn more about the XRCraftMC Minecraft Server and its features.',
+};
+
+export default function AboutPage() {
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">About XRCraftMC</h1>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">What is XRCraft?</h2>
+        <p className="mb-2">XRCraft is QuestCraft's official Minecraft server, included in the launcher of 6.0.0+</p>
+        <p>The server is VR optimized and works best on VR and on PC.</p>
+      </section>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">Version Support</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-semibold">Supported Versions:</h3>
+            <p>1.18.2 - 1.21.5</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Recommended Versions:</h3>
+            <p>1.21.1 - 1.21.4</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">Release Status</h2>
+        <p>Not yet released. XRCraft is in development and is slated for release on the day of QuestCraft 6.0's release.</p>
+      </section>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">Recommended Mods</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>SimpleVoiceChat</li>
+          <li>Vivecraft</li>
+        </ul>
+      </section>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">Development Updates & Links</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Development Updates: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">#updates-on-development</code> (Likely on Discord)</li>
+          <li>GitHub: <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">github.com/XRCraft</a> (Potential future plugins/utilities)</li>
+        </ul>
+      </section>
+
+      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 className="text-2xl font-semibold mb-3">Relation to QuestCraft</h2>
+        <p>QuestCraft is a large part as we are a VR server, but it is not our main point as we are still separate entities.</p>
+      </section>
+
+      <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow">
+        <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
+        <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
+      </section>
+    </div>
+  );
+}

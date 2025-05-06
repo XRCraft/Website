@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import "tailwindcss";
+
+/* Apply base light-mode styles and dark-mode variants directly to html */
+html {
+  background-color: #232323; /* dark Minecraft stone */
+  color: #E0E0E0; /* light stone */
+  font-family: 'Press Start 2P', Minecraftia, monospace;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Body can inherit or have specific styles if needed, but not conflicting bg/color */
+body {
+  background-color: #232323;
+  color: #E0E0E0;
+  font-family: 'Press Start 2P', Minecraftia, monospace;
+  /* Optional: add a pixelated grass background at the bottom */
+  background-image: linear-gradient(to bottom, transparent 80%, #5E7C16 100%), url('/grass.png');
+  background-repeat: repeat-x, repeat-x;
+  background-size: auto 40px, auto 40px;
+  background-position: bottom;
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    background-color: #fff;
+    color: #232323;
+  }
+  body {
+    background-color: #fff;
+    color: #232323;
+  }
+}
+
+/* Remove potentially conflicting :root and @media rules if they exist */
+/* :root { ... } */
+/* @media (prefers-color-scheme: dark) { ... } */
+
+/* Pixel border utility */
+.pixel-border {
+  border: 4px solid #444;
+  box-shadow: 0 0 0 4px #111;
+  border-radius: 0.25rem;
+}
+
+.grass-block-bg {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px; /* Move up to show the top of the grass block inside the border */
+  height: 40px;
+  width: 100%;
+  background: url('/grass.png') repeat-x;
+  background-size: auto 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+@media print {
+  .grass-block-bg {
+    display: none;
+  }
+}
