@@ -55,11 +55,6 @@ export default function AboutPage() {
         <h2 className="text-2xl font-semibold mb-3">Relation to QuestCraft</h2>
         <p>QuestCraft is a large part as we are a VR server, but it is not our main point as we are still separate entities.</p>
       </section>
-
-      <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow">
-        <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
-        <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
-      </section>
     </div>
   );
 }
