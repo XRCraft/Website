@@ -13,8 +13,6 @@ const fetcher = async (url: string) => {
 };
 
 export default function PlayerCount({ serverIp }: { serverIp: string }) {
-  const [retryCount, setRetryCount] = useState(0);
-  
   const { data, error, isLoading, mutate } = useSWR(
     `https://api.mcsrvstat.us/3/${serverIp}`, 
     fetcher, 
@@ -28,7 +26,6 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
 
   // Handle manual retry
   const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
     mutate(); // Re-fetch data
   };
 

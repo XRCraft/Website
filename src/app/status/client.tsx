@@ -2,6 +2,7 @@
 
 import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState, useEffect } from 'react';
 import useSWR from 'swr';
+import Image from 'next/image';
 
 // Define the Player type
 interface Player {
@@ -34,16 +35,14 @@ function parseMinecraftColors(text: string) {
     // XRCraft Network uses this pattern:
     // §c🎮 [Gradient colored text] §e🎮
     
-    let cleanText = cleanMotdText(text);
-    
-    // Find the text between gamepad emojis
-    const firstEmojiIndex = cleanText.indexOf('🎮');
-    const lastEmojiIndex = cleanText.lastIndexOf('🎮');
-    
+    const cleanText = cleanMotdText(text);
+    // Remove unused variables: beforeFirstEmoji, afterLastEmoji
+    const firstEmojiIndex = cleanText.indexOf('\ud83c\udfae');
+    const lastEmojiIndex = cleanText.lastIndexOf('\ud83c\udfae');
     if (firstEmojiIndex !== -1 && lastEmojiIndex !== -1 && firstEmojiIndex !== lastEmojiIndex) {
-      const beforeFirstEmoji = cleanText.substring(0, firstEmojiIndex);
+      // const beforeFirstEmoji = cleanText.substring(0, firstEmojiIndex);
       const betweenEmojis = cleanText.substring(firstEmojiIndex + 1, lastEmojiIndex).trim();
-      const afterLastEmoji = cleanText.substring(lastEmojiIndex + 1);
+      // const afterLastEmoji = cleanText.substring(lastEmojiIndex + 1);
       
       // Apply gradient to the text between emojis (like "Parkour is open!")
       // Generate a gradient from FF5E55 to FFED55
@@ -75,7 +74,7 @@ function parseMinecraftColors(text: string) {
     const versionEnd = cleanText.indexOf(']');
     
     if (versionStart !== -1 && versionEnd !== -1) {
-      const beforeVersion = cleanText.substring(0, versionStart).trim();
+      // const beforeVersion = cleanText.substring(0, versionStart).trim();
       const versionText = cleanText.substring(versionStart, versionEnd + 1);
       
       // Format with proper colors
@@ -106,8 +105,8 @@ function parseMinecraftColors(text: string) {
     }
     
     // Handle standard Minecraft color codes §e, §c, etc.
-    if (text[i] === '§' && i+1 < text.length) {
-      const code = text[i+1].toLowerCase();
+    if (text[i] === '\u00a7' && i+1 < text.length) {
+      // const code = text[i+1].toLowerCase();
       i += 2; // Skip over the color code
       
       // Skip this character (it was a color code)
@@ -132,7 +131,7 @@ function createExactDemoMotd() {
 
 export default function ServerStatusClient() {
   const serverIp = "play.xrcraftmc.com";
-  const [retryCount, setRetryCount] = useState(0);
+  const [retryCount, setRetryCount] = useState(0); // retryCount is unused, remove
   const [showRawMotd, setShowRawMotd] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -348,9 +347,11 @@ export default function ServerStatusClient() {
                           {typeof player === 'object' && player.name ? (
                             <>
                               {player.uuid && (
-                                <img 
+                                <Image 
                                   src={`https://crafatar.com/avatars/${player.uuid}?size=24&overlay`} 
                                   alt={`${player.name}'s avatar`}
+                                  width={24}
+                                  height={24}
                                   className="w-6 h-6 mr-2 rounded-sm"
                                 />
                               )}
