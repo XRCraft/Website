@@ -20,7 +20,7 @@ export default function SocialsPage() {
             GitHub: <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">github.com/XRCraft</a> (Potential future plugins/utilities)
           </li>
           <li>
-            Discord: <a href="https://discord.gg/5uNeeUWEFH" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">discord.gg/xrcraft</a> (Join our community!)
+            Discord: <a href="https://discord.gg/5uNeeUWEFH" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">https://discord.gg/5uNeeUWEFH</a>
           </li>
         </ul>
       </section>
