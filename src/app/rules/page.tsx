@@ -40,11 +40,13 @@ export default function RulesPage() {
       </section>
       <section>
         <h2 className="text-2xl font-semibold mb-4">General & Gamemode Rules</h2>
+        
+        <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow mb-4">
+          <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
+          <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
+        </section>
+        
         <ol className="list-decimal list-outside space-y-4 pl-6">
-      <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow">
-        <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
-        <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
-      </section>
           {rules.map((rule) => (
             <li key={rule.id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow">
               {rule.tag && (

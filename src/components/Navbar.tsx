@@ -1,18 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const pathname = usePathname()
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
 
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
     { href: "/rules", label: "Rules" },
     { href: "/servers", label: "Servers" },
+    { href: "/status", label: "Server Status" },
     { href: "/socials", label: "Socials" },
   ]
 
@@ -38,7 +50,9 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="hover:bg-mcbrown hover:text-mcsky font-minecraft transition-colors px-3 py-2 rounded pixel-border">
+              className={`hover:bg-mcbrown hover:text-mcsky font-minecraft transition-colors px-3 py-2 rounded pixel-border ${
+                pathname === link.href ? 'bg-mcbrown text-mcsky' : ''
+              }`}>
               {link.label}
             </Link>
           ))}
@@ -69,7 +83,9 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-3 py-2 rounded-md font-minecraft hover:bg-mcbrown hover:text-mcsky pixel-border transition-colors">
+                className={`block px-3 py-2 rounded-md font-minecraft hover:bg-mcbrown hover:text-mcsky pixel-border transition-colors ${
+                  pathname === link.href ? 'bg-mcbrown text-mcsky' : ''
+                }`}>
                 {link.label}
               </Link>
             ))}
