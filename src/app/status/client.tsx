@@ -269,7 +269,7 @@ export default function ServerStatusClient() {
                 <div className="bg-gray-200 dark:bg-gray-700 p-3 rounded font-minecraft border-2 border-gray-300 dark:border-gray-600 shadow-inner overflow-hidden">
                   {showRawMotd ? (
                     <div className="leading-tight text-xs font-mono overflow-x-auto whitespace-pre">
-                      {getMotdLines().map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
+                      {getMotdLines().map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
                         <div key={idx}>{line}</div>
                       ))}
                     </div>
