@@ -34,7 +34,7 @@ export default function RulesPage() {
         <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-200">
           <li>Rules may be updated at any time. Check back regularly. Pleading ignorance is not a valid excuse.</li>
           <li>Some rules only apply to specific gamemodes and are tagged accordingly (e.g., <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">(GAMEMODE)</span>).</li>
-          <li>Use common sense. If something seems unfair or is banned on most servers, it's likely banned here.</li>
+          <li>Use common sense. If something seems unfair or is banned on most servers, it will likely banned here.</li>
           <li>Staff are available to clarify rules.</li>
           <li>Staff hierarchy exists: Owners - Admins - Senior Mods - Mods. Lower ranks have limited permissions.</li>
         </ul>

@@ -17,7 +17,7 @@ export default function HomeClient() {
       {/* ...existing JSX code for the page... */}
       <section className="text-center py-12 bg-gradient-to-r from-blue-500 to-purple-600 dark:from-blue-700 dark:to-purple-800 rounded-lg shadow-lg">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Welcome to XRCraftMC!</h1>
-        <p className="text-xl text-white mb-6">QuestCraft's Official Minecraft Server - VR Optimized!</p>
+        <p className="text-xl text-white mb-6">VR Optimized!</p>
         <div className="inline-block bg-white dark:bg-gray-800 text-gray-800 dark:text-white px-6 py-3 rounded-md shadow-md">
           <p className="text-lg font-semibold flex items-center justify-center gap-2">
             Join us at:
@@ -44,7 +44,7 @@ export default function HomeClient() {
       <section className="grid md:grid-cols-2 gap-6">
         <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
           <h2 className="text-2xl font-semibold mb-3 text-blue-600 dark:text-blue-400">What is XRCraft?</h2>
-          <p className="mb-2">XRCraft is QuestCraft's official Minecraft server, included in the launcher from version 6.0.0 onwards.</p>
+          <p className="mb-2">XRCraft is a VR optimized server that is available on QuestCraft by default.</p>
           <p>The server is VR optimized and works best on VR and PC.</p>
         </div>
         <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">

@@ -12,7 +12,7 @@ export default function AboutPage() {
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">What is XRCraft?</h2>
-        <p className="mb-2">XRCraft is QuestCraft's official Minecraft server, included in the launcher of 6.0.0+</p>
+        <p className="mb-2">XRCraft is a Minecraft server, which may be included by default.</p>
         <p>The server is VR optimized and works best on VR and on PC.</p>
       </section>
 
@@ -32,7 +32,7 @@ export default function AboutPage() {
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">Release Status</h2>
-        <p>Not yet released. XRCraft is in development and is slated for release on the day of QuestCraft 6.0's release.</p>
+        <p>Not yet released. XRCraft is in development and is slated for release on the day of QuestCraft 6.0.</p>
       </section>
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
