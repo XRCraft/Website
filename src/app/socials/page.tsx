@@ -19,7 +19,9 @@ export default function SocialsPage() {
           <li>
             GitHub: <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">github.com/XRCraft</a> (Potential future plugins/utilities)
           </li>
-          {/* Add other socials like Discord, Twitter etc. here when available */}
+          <li>
+            Discord: <a href="https://discord.gg/5uNeeUWEFH" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">discord.gg/xrcraft</a> (Join our community!)
+          </li>
         </ul>
       </section>
 
