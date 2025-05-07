@@ -131,7 +131,7 @@ function createExactDemoMotd() {
 
 export default function ServerStatusClient() {
   const serverIp = "play.xrcraftmc.com";
-  const [retryCount, setRetryCount] = useState(0); // retryCount is unused, remove
+  const [,setRetryCount] = useState(0); 
   const [showRawMotd, setShowRawMotd] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
