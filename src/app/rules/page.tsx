@@ -4,12 +4,6 @@ export const metadata: Metadata = {
   title: 'Rules | XRCraftMC',
   description: 'Read the rules for playing on the XRCraftMC Minecraft Server.',
 };
-
-<section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow">
-<h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
-<p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
-</section>
-
 export default function RulesPage() {
   const rules = [
     { id: 1, text: "No spamming of any type. This means no obnoxious noises, texts, or soundboards through ingame voicechat." },
@@ -27,7 +21,7 @@ export default function RulesPage() {
     { id: 13, tag: "BEDWARS", text: "No crossteaming. If you want to be on the same team, please join the same team before the match." },
     { id: 14, tag: "MINIGAMES", text: "Turn off any minimaps and freecam. Any minimap gives a unfair advantage, along with freecam." },
     { id: 15, tag: "SURVIVALIZED GAMEMODES", text: "No use of freecam. In certain situations, freecam may be useful to check builds, where it is fine to do that, but as soon as ANY player or unfair advantage like using it for far ranged attacks, or interactions, is bannable. We recommend you do not use it at all as this can be used against you." },
-    { id: 16, text: "VPNs are not allowed. VPNs and proxy services are not allowed, and you may be kicked and unable to join. If you need to connect via a VPN or proxy, please contact staff privately for potential allowance." }, // Slightly rephrased VPN rule for clarity
+    { id: 16, text: "VPNs are not allowed. VPNs and proxy services are not allowed, and you may be kicked and unable to join. If you need to connect via a VPN or proxy, please contact staff privately for potential allowance." }, 
   ];
 
   return (
@@ -44,10 +38,13 @@ export default function RulesPage() {
           <li>Staff hierarchy exists: Owners - Admins - Senior Mods - Mods. Lower ranks have limited permissions.</li>
         </ul>
       </section>
-
       <section>
         <h2 className="text-2xl font-semibold mb-4">General & Gamemode Rules</h2>
         <ol className="list-decimal list-outside space-y-4 pl-6">
+      <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow">
+        <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
+        <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
+      </section>
           {rules.map((rule) => (
             <li key={rule.id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow">
               {rule.tag && (
