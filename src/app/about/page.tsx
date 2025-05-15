@@ -25,7 +25,7 @@ export default function AboutPage() {
           </div>
           <div>
             <h3 className="font-semibold">Recommended Versions:</h3>
-            <p>1.21.1 - 1.21.4</p>
+            <p>1.21.1 - 1.21.5</p>
           </div>
         </div>
       </section>
@@ -40,14 +40,6 @@ export default function AboutPage() {
         <ul className="list-disc list-inside space-y-1">
           <li>SimpleVoiceChat</li>
           <li>Vivecraft</li>
-        </ul>
-      </section>
-
-      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-3">Development Updates & Links</h2>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Development Updates: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">#updates-on-development</code> (Likely on Discord)</li>
-          <li>GitHub: <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">github.com/XRCraft</a> (Potential future plugins/utilities)</li>
         </ul>
       </section>
 

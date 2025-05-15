@@ -8,26 +8,26 @@ export const metadata: Metadata = {
 export default function SocialsPage() {
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Connect with Us</h1>
+      <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Connect with us</h1>
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">Official Social Media</h2>
         <ul className="list-disc list-inside space-y-2">
           <li>
-            Bluesky: <a href="https://bsky.app/profile/xrcraftmc.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">bsky.app/profile/xrcraftmc.com</a>
+            <a href="https://bsky.app/profile/xrcraftmc.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">Bluesky</a>
           </li>
           <li>
-            GitHub: <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">github.com/XRCraft</a> (Potential future plugins/utilities)
+            <a href="https://github.com/XRCraft" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">Github</a>
           </li>
           <li>
-            Discord: <a href="https://discord.gg/5uNeeUWEFH" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">https://discord.gg/5uNeeUWEFH</a>
+            <a href="https://discord.gg/5uNeeUWEFH" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">Discord</a>
           </li>
         </ul>
       </section>
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">Social Media Role Requirements</h2>
-        <p className="mb-4">Requirements for obtaining a special role (e.g., on Discord) based on your social media presence. The profile must be linked to your game/Discord profile.</p>
+        <p className="mb-4">Requirements for obtaining a special role (e.g., on Discord) based on your social media presence. The profile must be linked to your Discord profile.</p>
         <div className="space-y-4">
           <div>
             <h3 className="font-semibold text-lg">YouTube</h3>

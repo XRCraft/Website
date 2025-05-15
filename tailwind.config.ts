@@ -22,6 +22,7 @@ const config: Config = {
         mcstone: '#A0A0A0', // Minecraft stone
         mcsky: '#6EC6F2',   // Minecraft sky
         mcwood: '#B97A57',  // Minecraft wood
+        mcgold: '#FCDB05',  // Minecraft gold
       },
       boxShadow: {
         pixel: '0 0 0 4px #222, 0 0 0 8px #fff',
@@ -34,6 +35,18 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+      },
+      dropShadow: {
+        'glow': '0 0 8px rgba(0, 195, 255, 0.5)',
       },
     },
   },

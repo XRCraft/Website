@@ -1,10 +1,21 @@
-import { Inter } from "next/font/google";
+import { Inter, Press_Start_2P, VT323, Rubik } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Metadata, Viewport } from 'next';
 import AnimatedLayout from "@/components/AnimatedLayout";
+
+// Fonts
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
+const pressStart2P = Press_Start_2P({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-minecraft" });
+const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-minecraft-alt" });
+const rubik = Rubik({ 
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-rubik",
+  weight: ["400", "500", "600", "700"],
+});
 
 // Viewport configuration
 export const viewport: Viewport = {
@@ -63,32 +74,47 @@ export const metadata: Metadata = {
   },
 };
 
-const inter = Inter({ subsets: ["latin"] });
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${inter.variable} ${pressStart2P.variable} ${vt323.variable} ${rubik.variable}`}>
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${inter.className} min-h-screen flex flex-col font-minecraft`}>
+      <body className="min-h-screen flex flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           enableColorScheme={false}
         >
+          {/* Minecraft particles effect (optional decorative element) */}
+          <div className="particles" aria-hidden="true">
+            {Array.from({ length: 15 }).map((_, i) => (
+              <div
+                key={i}
+                className="absolute bg-white rounded-full w-1 h-1 opacity-30"
+                style={{
+                  top: `${(Math.sin(i * 0.5) * 0.5 + 0.5) * 100}%`,
+                  left: `${(Math.cos(i * 0.7) * 0.5 + 0.5) * 100}%`,
+                  animation: `float ${10 + i % 8 * 2.5}s linear infinite`,
+                  animationDelay: `${i * 0.7}s`,
+                  willChange: 'transform'
+                }}
+              />
+            ))}
+          </div>
+          
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white">
             Skip to main content
           </a>
           <Navbar />
-          <main id="main-content" className="flex-grow container mx-auto px-4 py-8 w-full font-minecraft">
+          <main id="main-content" className="flex-grow container mx-auto px-4 py-8 w-full">
             <AnimatedLayout>{children}</AnimatedLayout>
           </main>
           <Footer />

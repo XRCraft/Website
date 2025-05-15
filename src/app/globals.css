@@ -1,30 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rubik:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 /* Apply base light-mode styles and dark-mode variants directly to html */
 html {
   background-color: #232323; /* dark Minecraft stone */
   color: #E0E0E0; /* light stone */
-  font-family: 'Press Start 2P', Minecraftia, monospace;
+  font-family: 'Rubik', sans-serif;
   transition: background 0.3s, color 0.3s;
+  scroll-behavior: smooth;
 }
 
 /* Body can inherit or have specific styles if needed, but not conflicting bg/color */
 body {
   background-color: #232323;
   color: #E0E0E0;
-  font-family: 'Press Start 2P', Minecraftia, monospace;
-  /* Optional: add a pixelated grass background at the bottom */
-  background-image: linear-gradient(to bottom, transparent 80%, #5E7C16 100%), url('/grass.png');
+  font-family: 'Rubik', sans-serif;
+  /* Enhanced pixelated grass background at the bottom */
+  background-image: linear-gradient(to bottom, transparent 80%, rgba(94, 124, 22, 0.8) 100%), url('/grass.png');
   background-repeat: repeat-x, repeat-x;
   background-size: auto 40px, auto 40px;
   background-position: bottom;
+  letter-spacing: 0.5px;
+  line-height: 1.5;
 }
 
 html, body {
   position: relative;
   z-index: 0;
 }
+
 body::before {
   content: '';
   position: fixed;
@@ -38,6 +42,31 @@ body::before {
   opacity: 0.7;
   pointer-events: none;
   transition: background 0.3s;
+  animation: subtle-float 15s ease-in-out infinite alternate;
+}
+
+@keyframes subtle-float {
+  0% {
+    transform: scale(1.02) translate(-0.5%, -0.5%);
+    will-change: transform;
+  }
+  100% {
+    transform: scale(1) translate(0.5%, 0.5%);
+    will-change: transform;
+  }
+}
+
+@keyframes pixel-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 4px #111;
+    will-change: transform, box-shadow;
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px #222, 0 0 10px rgba(0, 255, 0, 0.3);
+    will-change: transform, box-shadow;
+  }
 }
 
 @media (prefers-color-scheme: light) {
@@ -55,17 +84,70 @@ body::before {
   }
 }
 
-/* Remove potentially conflicting :root and @media rules if they exist */
-/* :root { ... } */
-/* @media (prefers-color-scheme: dark) { ... } */
+/* Minecraft themed variables */
+:root {
+  --mc-dirt: #866043;
+  --mc-grass: #5E7C16;
+  --mc-stone: #9E9E9E;
+  --mc-water: #3D82D6;
+  --mc-lava: #E25822;
+  --mc-gold: #FCDB05;
+  --mc-diamond: #5DECF5;
+  --mc-redstone: #FF0000;
+}
 
-/* Pixel border utility */
+/* Enhanced Pixel border utility */
 .pixel-border {
   border: 4px solid #444;
   box-shadow: 0 0 0 4px #111;
   border-radius: 0.25rem;
+  transition: all 0.2s;
 }
 
+.pixel-border:hover {
+  box-shadow: 0 0 0 4px #222, 0 0 10px rgba(0, 255, 0, 0.2);
+}
+
+/* Button animations */
+.mc-button {
+  position: relative;
+  transition: all 0.1s;
+  transform-style: preserve-3d;
+}
+
+.mc-button:active {
+  transform: translateY(2px);
+}
+
+.mc-button::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 0 0 4px 4px;
+  transition: all 0.1s;
+}
+
+.mc-button:active::after {
+  bottom: -2px;
+  height: 2px;
+}
+
+/* Minecraft hover effect */
+.mc-hover {
+  transition: all 0.2s;
+}
+
+.mc-hover:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Grass block styling */
 .grass-block-bg {
   position: absolute;
   left: 0;
@@ -77,9 +159,100 @@ body::before {
   background-size: auto 40px;
   pointer-events: none;
   z-index: 0;
+  animation: grass-sway 4s ease-in-out infinite alternate;
 }
+
+@keyframes grass-sway {
+  0% {
+    background-position: 0px 0px;
+    will-change: background-position;
+  }
+  100% {
+    background-position: 20px 0px;
+    will-change: background-position;
+  }
+}
+
+/* VT323 for secondary text */
+.font-minecraft-alt {
+  font-family: 'VT323', monospace;
+  font-size: 1.2em;
+  letter-spacing: 0.5px;
+}
+
+/* Apply pixel font only to headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Press_Start_2P', monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5em;
+}
+
+/* Apply Rubik to body text */
+p, span, a, div, li {
+  font-family: 'Rubik', sans-serif;
+}
+
+/* Special classes to override font styles when needed */
+.pixel-font {
+  font-family: 'Press_Start_2P', monospace !important;
+}
+
+.normal-font {
+  font-family: 'Rubik', sans-serif !important;
+}
+
+/* Adjust heading sizes for better readability */
+h1 { font-size: 1.8rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.3rem; }
+h4 { font-size: 1.1rem; }
+h5, h6 { font-size: 1rem; }
+
+/* Improved code blocks */
+code {
+  font-family: 'VT323', monospace;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border-left: 3px solid var(--mc-diamond);
+}
+
+/* Hide grass on print */
 @media print {
   .grass-block-bg {
     display: none;
   }
+}
+
+/* Particles effect */
+.particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Card hover effects */
+.mc-card {
+  transition: all 0.3s;
+  transform-style: preserve-3d;
+}
+
+.mc-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Section transitions */
+.mc-section {
+  transition: all 0.5s;
+  opacity: 0.95;
+}
+
+.mc-section:hover {
+  opacity: 1;
 }

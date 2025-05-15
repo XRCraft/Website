@@ -10,13 +10,40 @@ interface Player {
   uuid?: string;
 }
 
-// Function to fetch data from the API
+// Function to fetch data from the API with better error handling
 const fetcher = async (url: string) => {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error('Failed to fetch server status');
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    const res = await fetch(url, { 
+      signal: controller.signal,
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+      // No need for CORS options since we're using our own API endpoint
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (!res.ok) {
+      throw new Error(`Failed to fetch server status: ${res.status}`);
+    }
+    
+    return res.json();
+  } catch (error) {
+    // Provide more specific error messages based on error type
+    if (error instanceof TypeError && error.message.includes('NetworkError')) {
+      console.error('Network error when fetching server status - possibly CORS or connectivity issue');
+      throw new Error('Network connectivity issue. Please check your internet connection.');
+    } else if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'AbortError') {
+      console.error('Request timeout when fetching server status');
+      throw new Error('Request timed out. Server may be experiencing high load.');
+    } else {
+      console.error('Error fetching server status:', error);
+      throw error;
+    }
   }
-  return res.json();
 };
 
 // Function to create a clean string representation from MOTD with color codes stripped
@@ -36,13 +63,10 @@ function parseMinecraftColors(text: string) {
     // §c🎮 [Gradient colored text] §e🎮
     
     const cleanText = cleanMotdText(text);
-    // Remove unused variables: beforeFirstEmoji, afterLastEmoji
     const firstEmojiIndex = cleanText.indexOf('\ud83c\udfae');
     const lastEmojiIndex = cleanText.lastIndexOf('\ud83c\udfae');
     if (firstEmojiIndex !== -1 && lastEmojiIndex !== -1 && firstEmojiIndex !== lastEmojiIndex) {
-      // const beforeFirstEmoji = cleanText.substring(0, firstEmojiIndex);
       const betweenEmojis = cleanText.substring(firstEmojiIndex + 1, lastEmojiIndex).trim();
-      // const afterLastEmoji = cleanText.substring(lastEmojiIndex + 1);
       
       // Apply gradient to the text between emojis (like "Parkour is open!")
       // Generate a gradient from FF5E55 to FFED55
@@ -64,8 +88,7 @@ function parseMinecraftColors(text: string) {
       return `<span style="color:#FF5555">🎮</span> ${gradientHtml} <span style="color:#FFAA00">🎮</span>`;
     }
   }
-  
-  // For the first line with server name and version
+    // For the first line with server name and version
   if (text.includes('XRCraft Network') && text.includes('[')) {
     const cleanText = cleanMotdText(text);
     
@@ -74,11 +97,11 @@ function parseMinecraftColors(text: string) {
     const versionEnd = cleanText.indexOf(']');
     
     if (versionStart !== -1 && versionEnd !== -1) {
-      // const beforeVersion = cleanText.substring(0, versionStart).trim();
+      const serverName = cleanText.substring(0, versionStart).trim();
       const versionText = cleanText.substring(versionStart, versionEnd + 1);
       
       // Format with proper colors
-      return `<span style="color:#FFAA00; font-weight:bold">XRCraft Network</span> <span style="color:#FF5555">${versionText}</span>`;
+      return `<span style="color:#FFAA00; font-weight:bold">${serverName}</span> <span style="color:#FF5555">${versionText}</span>`;
     }
   }
   
@@ -102,14 +125,46 @@ function parseMinecraftColors(text: string) {
       result += `<span style="color:#${hexColor}">${nextChar}</span>`;
       i += 9; // Move past the color code and the character
       continue;
-    }
-    
-    // Handle standard Minecraft color codes §e, §c, etc.
-    if (text[i] === '\u00a7' && i+1 < text.length) {
-      // const code = text[i+1].toLowerCase();
-      i += 2; // Skip over the color code
+    }    // Handle standard Minecraft color codes §e, §c, etc.
+    if (text[i] === '\u00a7' || text[i] === '§') {
+      const colorCharacter = i+1 < text.length ? text[i+1].toLowerCase() : '';
+      const colorMap: Record<string, string> = {
+        '0': '#000000', // Black
+        '1': '#0000AA', // Dark Blue
+        '2': '#00AA00', // Dark Green
+        '3': '#00AAAA', // Dark Aqua
+        '4': '#AA0000', // Dark Red
+        '5': '#AA00AA', // Dark Purple
+        '6': '#FFAA00', // Gold
+        '7': '#AAAAAA', // Gray
+        '8': '#555555', // Dark Gray
+        '9': '#5555FF', // Blue
+        'a': '#55FF55', // Green
+        'b': '#55FFFF', // Aqua
+        'c': '#FF5555', // Red
+        'd': '#FF55FF', // Light Purple
+        'e': '#FFFF55', // Yellow
+        'f': '#FFFFFF', // White
+      };
       
-      // Skip this character (it was a color code)
+      // Handle formatting codes
+      const formattingMap: Record<string, string> = {
+        'l': 'font-weight:bold;',
+        'o': 'font-style:italic;',
+        'n': 'text-decoration:underline;',
+        'm': 'text-decoration:line-through;',
+      };
+      
+      if (colorMap[colorCharacter]) {
+        i += 2; // Skip over the color code
+        result += `<span style="color:${colorMap[colorCharacter]}">`;
+      } else if (formattingMap[colorCharacter]) {
+        i += 2; // Skip over the formatting code
+        result += `<span style="${formattingMap[colorCharacter]}">`;
+      } else {
+        i += 2; // Skip over other formatting code
+      }
+      
       continue;
     }
     
@@ -135,34 +190,106 @@ export default function ServerStatusClient() {
   const [showRawMotd, setShowRawMotd] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [lastUpdated, setLastUpdated] = useState(new Date());  const [isOnline, setIsOnline] = useState(true); // Default to true initially
   
+  // Monitor network connectivity
+  useEffect(() => {
+    // Set the initial online status after mounting
+    setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+    
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   const { data, error, isLoading, mutate } = useSWR(
-    `https://api.mcsrvstat.us/3/${serverIp}`, 
+    `/api/server-status?ip=${serverIp}`, 
     fetcher, 
     {
       refreshInterval: 30000, // Refresh every 30 seconds
-      errorRetryCount: 3,
+      errorRetryCount: 5, // Increased retries
+      errorRetryInterval: 5000, // Start with 5 second retry interval
       revalidateOnFocus: true,
+      dedupingInterval: 10000, // Deduping interval
+      keepPreviousData: true, // Keep showing previous data while revalidating
+      onErrorRetry: (error, key, config, revalidate, { retryCount }) => {
+        // Don't retry for specific errors
+        if (error.message.includes('connectivity')) return;
+        
+        // Exponential backoff
+        const delay = Math.min(1000 * 2 ** retryCount, 30000);
+        setTimeout(() => revalidate({ retryCount }), delay);
+      },
+      fallbackData: { // Provide fallback data when offline
+        online: false,
+        motd: { raw: createExactDemoMotd() },
+        players: { online: 0, max: 100, list: [] },
+        version: "1.21.5"
+      }
     }
   );
-
   const handleRetry = async () => {
     setIsRefreshing(true);
     setRetryCount(prev => prev + 1);
-    await mutate(); // Wait for the data to refresh
-    setLastUpdated(new Date());
     
-    // Add a slight delay before removing the refreshing state for better UX
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 300);
+    try {
+      await mutate(); // Wait for the data to refresh
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error('Error during manual retry:', error);
+      // Error is handled by SWR and will update the error state
+    } finally {
+      // Add a slight delay before removing the refreshing state for better UX
+      setTimeout(() => {
+        setIsRefreshing(false);
+      }, 300);
+    }
   };
-  
+  // Use a ref to track if we're on client side
+  const isBrowser = typeof window !== 'undefined';
+
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(serverIp);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    // Exit early if not in browser
+    if (!isBrowser) return;
+    
+    try {
+      await navigator.clipboard.writeText(serverIp);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (error) {
+      console.error('Failed to copy using clipboard API:', error);
+      
+      // Fallback method
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = serverIp;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const successful = document.execCommand('copy');
+        if (successful) {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 1500);
+        } else {
+          console.error('Fallback clipboard copy failed');
+          alert(`Please copy this IP manually: ${serverIp}`);
+        }
+        
+        document.body.removeChild(textArea);
+      } catch (err) {
+        console.error('All clipboard methods failed:', err);
+        alert(`Please copy this IP manually: ${serverIp}`);
+      }
+    }
   };
   
   // Get MOTD lines, using our exact demo if none exists
@@ -179,19 +306,89 @@ export default function ServerStatusClient() {
       setLastUpdated(new Date());
     }
   }, [data]);
+  
+  // Function to try alternative API if main one fails
+  const tryAlternativeAPI = async () => {
+    // Exit early if not in browser
+    if (!isBrowser) return false;
+    
+    setIsRefreshing(true);
+    try {
+      // Try our server-side proxy API with an added timestamp to bypass cache
+      const res = await fetch(`/api/server-status?ip=${serverIp}&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        await mutate(data, false); // Update the data without revalidation
+        setLastUpdated(new Date());
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Alternative API failed:', error);
+      return false;
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Add a simple connectivity test
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
+    if (isOnline && (error || !data)) {
+      // If we're online but have an error or no data, check basic connectivity
+      intervalId = setInterval(() => {
+        // Simple fetch to a reliable endpoint to check if internet is working
+        fetch('https://www.cloudflare.com/cdn-cgi/trace', { 
+          mode: 'no-cors',
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        })
+          .then(() => {
+            console.log('Basic connectivity test passed');
+            // If this succeeds but the main API call fails, it indicates the API might be the issue
+          })
+          .catch(err => {
+            console.warn('Basic connectivity test failed:', err);
+            // If this fails too, user likely has connectivity issues
+            setIsOnline(false);
+          });
+      }, 30000); // Check every 30 seconds
+    }
+    
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isOnline, error, data]);
 
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Server Status</h1>
-      
-      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">play.xrcraftmc.com</h2>
+          <div>
+            <h2 className="text-2xl font-semibold">play.xrcraftmc.com</h2>
+            {!isOnline && (
+              <div className="text-red-500 text-sm mt-1 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                You are currently offline
+              </div>
+            )}
+          </div>
           <button 
             onClick={handleRetry}
             className={`px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 flex items-center gap-1 ${isRefreshing ? 'opacity-75' : ''}`}
             aria-label="Refresh server status"
-            disabled={isRefreshing}
+            disabled={isRefreshing || !isOnline}
+            title={!isOnline ? "You are offline. Connect to the internet to refresh." : "Refresh server status"}
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -204,28 +401,62 @@ export default function ServerStatusClient() {
             </svg>
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
-        </div>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center h-48">
-            <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        </div>        {isLoading ? (
+          <div className="flex flex-col justify-center items-center h-48">
+            <svg className="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-          </div>
-        ) : error || !data ? (
-          <div className="flex flex-col items-center justify-center h-48 text-center">
-            <div className="text-red-500 text-xl mb-4">Unable to connect to server</div>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              The server may be offline or under maintenance.
+            <p className="text-gray-600 dark:text-gray-400 text-center">
+              Connecting to server...
+              <br />
+              <span className="text-sm">This may take a few moments</span>
             </p>
-            <button 
-              onClick={handleRetry}
-              className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
-              disabled={isRefreshing}
-            >
-              {isRefreshing ? 'Trying...' : 'Try Again'}
-            </button>
+            {!isOnline && (
+              <p className="mt-4 text-red-500 text-sm text-center">
+                You appear to be offline. Check your internet connection.
+              </p>
+            )}
+          </div>) : error || !data ? (
+          <div className="flex flex-col items-center justify-center h-48 text-center">
+            <div className="text-red-500 text-xl mb-4">
+              {error?.message || "Unable to connect to server"}
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {error?.message?.includes('connectivity') 
+                ? "Please check your internet connection and try again." 
+                : error?.message?.includes('timed out')
+                ? "The request timed out. This could be due to server load or network issues."
+                : "The server may be offline or under maintenance. We'll keep trying to reconnect."}
+            </p>            <div className="flex flex-wrap gap-3 justify-center">
+              <button 
+                onClick={handleRetry}
+                className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
+                disabled={isRefreshing}
+              >
+                {isRefreshing ? 'Trying...' : 'Try Again'}
+              </button>
+              
+              <button 
+                onClick={tryAlternativeAPI}
+                className={`px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
+                disabled={isRefreshing || !isOnline}
+                title={!isOnline ? "You need to be online" : "Try alternative method"}
+              >
+                Try Alternative Method
+              </button>
+              
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition duration-200"
+                aria-label="Reload the page"
+              >
+                Reload Page
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              Last attempt: {lastUpdated.toLocaleTimeString()}
+            </p>
           </div>
         ) : !data.online ? (
           <div className="flex flex-col items-center justify-center h-48 text-center">
