@@ -31,10 +31,10 @@ export const viewport: Viewport = {
 // SEO Metadata
 export const metadata: Metadata = {
   title: {
-    template: '%s | XRCraftMC',
-    default: 'XRCraftMC - VR Optimized Minecraft Server',
+    template: '%s | XRCraft',
+    default: 'XRCraft - VR Optimized Minecraft Server',
   },
-  description: 'A VR optimized Minecraft server available on QuestCraft by default. Join us for Survival, Bedwars, Minigames and more.',
+  description: 'A VR optimized Minecraft server available on QuestCraft by default. ',
   keywords: ['minecraft', 'vr minecraft', 'questcraft', 'minecraft server', 'vr gaming', 'xrcraft'],
   metadataBase: new URL('https://xrcraftmc.com'),
   openGraph: {
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/logo.png',
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: 'XRCraftMC Logo',
       }
     ],
