@@ -171,14 +171,13 @@ export default function Footer() {
         </div>
       </div>
       
-      {/* Bottom grass border */}
+      {/* Bottom grass border along with rights reserved text */}
       <div className="grass-block-bg" aria-hidden="true" />
-      
-      {/* Copyright Bar */}
-      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm text-white rounded-t-lg py-2 px-6 text-center max-w-[90vw] shadow-lg border-2 border-white/10 border-b-0">
-        <span className="text-xs whitespace-nowrap">
-          © {currentYear} XRCraftMC. All rights reserved. XRCraft is not affiliated with Mojang Studios or Microsoft.
-        </span>
+      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm text-white rounded-t-lg py-2 px-3 sm:px-4 md:px-6 text-center max-w-[95vw] sm:max-w-[90vw] w-auto shadow-lg border-2 border-white/10 border-b-0">
+        <div className="text-[7px] sm:text-xs">
+          © {currentYear} XRCraftMC. All rights reserved. <br className="sm:hidden" />
+          XRCraft is not affiliated with Mojang Studios or Microsoft.
+        </div>
       </div>
     </footer>
   );
