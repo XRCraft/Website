@@ -114,13 +114,13 @@ export default function Navbar() {
         aria-hidden={!isMobileMenuOpen}
         aria-labelledby="mobile-menu-button"
         className={clsx(
-          'md:hidden absolute top-full left-0 right-0 bg-mcgreen pixel-border shadow-lg transform transition-all duration-300 overflow-hidden',
+          'md:hidden absolute top-full left-0 right-0 backdrop-blur-md bg-mcgreen bg-opacity-80 pixel-border shadow-lg transform transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         )}
       >
         <ul className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           {NAV_LINKS.map((link) => (
-            <li key={link.href}>
+            <li key={link.href} className="text-center">
               <Link
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
