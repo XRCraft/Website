@@ -165,7 +165,7 @@ export default function HomeClient() {
               providing the best experience for VR players while remaining fully compatible with PC!
             </p>
             <p className="mb-6 text-white">
-              Explore our world with enhanced graphics, custom features, and a welcoming community.
+              Explore our gamemodes with a welcoming community.
             </p>
             <div className="flex items-center mt-4 bg-black/20 p-3 rounded-md pixel-border">
               <p className="text-sm font-semibold mr-2 text-white">Server IP:</p>
