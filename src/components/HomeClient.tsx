@@ -238,11 +238,7 @@ export default function HomeClient() {
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-white mb-2 pixel-font">Coming Soon!</h3>
-              <p className="text-yellow-100">
-                XRCraft is currently in development and slated for release alongside QuestCraft 6.0.
-                Join our Discord to stay updated and be the first to know when we launch!
-              </p>
+              
             </div>
             <div className="flex-shrink-0 mt-4 md:mt-0">
               <a 
