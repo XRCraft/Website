@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
   // Performance optimizations
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
   
   // Enable image optimization
   images: {
