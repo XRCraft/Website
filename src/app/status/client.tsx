@@ -15,13 +15,15 @@ const fetcher = async (url: string) => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-    
+
     const res = await fetch(url, { 
       signal: controller.signal,
       headers: {
-        'Cache-Control': 'no-cache'
-      }
-      // No need for CORS options since we're using our own API endpoint
+        'Cache-Control': 'no-cache',
+      },
+      // Add retry logic with exponential backoff
+      mode: 'cors',
+      credentials: 'omit'
     });
     
     clearTimeout(timeoutId);
@@ -36,7 +38,7 @@ const fetcher = async (url: string) => {
     if (error instanceof TypeError && error.message.includes('NetworkError')) {
       console.error('Network error when fetching server status - possibly CORS or connectivity issue');
       throw new Error('Network connectivity issue. Please check your internet connection.');
-    } else if (typeof error === 'object' && error !== null && 'name' in error && (error as any).name === 'AbortError') {
+    } else if (typeof error === 'object' && error !== null && 'name' in error && (error as { name: string }).name === 'AbortError') {
       console.error('Request timeout when fetching server status');
       throw new Error('Request timed out. Server may be experiencing high load.');
     } else {
@@ -125,7 +127,8 @@ function parseMinecraftColors(text: string) {
       result += `<span style="color:#${hexColor}">${nextChar}</span>`;
       i += 9; // Move past the color code and the character
       continue;
-    }    // Handle standard Minecraft color codes §e, §c, etc.
+    }
+      // Handle standard Minecraft color codes §e, §c, etc.
     if (text[i] === '\u00a7' || text[i] === '§') {
       const colorCharacter = i+1 < text.length ? text[i+1].toLowerCase() : '';
       const colorMap: Record<string, string> = {
@@ -147,22 +150,11 @@ function parseMinecraftColors(text: string) {
         'f': '#FFFFFF', // White
       };
       
-      // Handle formatting codes
-      const formattingMap: Record<string, string> = {
-        'l': 'font-weight:bold;',
-        'o': 'font-style:italic;',
-        'n': 'text-decoration:underline;',
-        'm': 'text-decoration:line-through;',
-      };
-      
       if (colorMap[colorCharacter]) {
         i += 2; // Skip over the color code
         result += `<span style="color:${colorMap[colorCharacter]}">`;
-      } else if (formattingMap[colorCharacter]) {
-        i += 2; // Skip over the formatting code
-        result += `<span style="${formattingMap[colorCharacter]}">`;
       } else {
-        i += 2; // Skip over other formatting code
+        i += 2; // Skip over the formatting code
       }
       
       continue;
@@ -190,13 +182,11 @@ export default function ServerStatusClient() {
   const [showRawMotd, setShowRawMotd] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());  const [isOnline, setIsOnline] = useState(true); // Default to true initially
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   
   // Monitor network connectivity
   useEffect(() => {
-    // Set the initial online status after mounting
-    setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
-    
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
     
@@ -208,8 +198,8 @@ export default function ServerStatusClient() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
-  const { data, error, isLoading, mutate } = useSWR(
-    `/api/server-status?ip=${serverIp}`, 
+    const { data, error, isLoading, mutate } = useSWR(
+    `https://api.mcsrvstat.us/3/${serverIp}`, 
     fetcher, 
     {
       refreshInterval: 30000, // Refresh every 30 seconds
@@ -251,45 +241,11 @@ export default function ServerStatusClient() {
       }, 300);
     }
   };
-  // Use a ref to track if we're on client side
-  const isBrowser = typeof window !== 'undefined';
-
+  
   const handleCopy = async () => {
-    // Exit early if not in browser
-    if (!isBrowser) return;
-    
-    try {
-      await navigator.clipboard.writeText(serverIp);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (error) {
-      console.error('Failed to copy using clipboard API:', error);
-      
-      // Fallback method
-      try {
-        const textArea = document.createElement('textarea');
-        textArea.value = serverIp;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        const successful = document.execCommand('copy');
-        if (successful) {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 1500);
-        } else {
-          console.error('Fallback clipboard copy failed');
-          alert(`Please copy this IP manually: ${serverIp}`);
-        }
-        
-        document.body.removeChild(textArea);
-      } catch (err) {
-        console.error('All clipboard methods failed:', err);
-        alert(`Please copy this IP manually: ${serverIp}`);
-      }
-    }
+    await navigator.clipboard.writeText(serverIp);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   };
   
   // Get MOTD lines, using our exact demo if none exists
@@ -306,89 +262,19 @@ export default function ServerStatusClient() {
       setLastUpdated(new Date());
     }
   }, [data]);
-  
-  // Function to try alternative API if main one fails
-  const tryAlternativeAPI = async () => {
-    // Exit early if not in browser
-    if (!isBrowser) return false;
-    
-    setIsRefreshing(true);
-    try {
-      // Try our server-side proxy API with an added timestamp to bypass cache
-      const res = await fetch(`/api/server-status?ip=${serverIp}&t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache'
-        }
-      });
-      
-      if (res.ok) {
-        const data = await res.json();
-        await mutate(data, false); // Update the data without revalidation
-        setLastUpdated(new Date());
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error('Alternative API failed:', error);
-      return false;
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  // Add a simple connectivity test
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-    
-    if (isOnline && (error || !data)) {
-      // If we're online but have an error or no data, check basic connectivity
-      intervalId = setInterval(() => {
-        // Simple fetch to a reliable endpoint to check if internet is working
-        fetch('https://www.cloudflare.com/cdn-cgi/trace', { 
-          mode: 'no-cors',
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache' }
-        })
-          .then(() => {
-            console.log('Basic connectivity test passed');
-            // If this succeeds but the main API call fails, it indicates the API might be the issue
-          })
-          .catch(err => {
-            console.warn('Basic connectivity test failed:', err);
-            // If this fails too, user likely has connectivity issues
-            setIsOnline(false);
-          });
-      }, 30000); // Check every 30 seconds
-    }
-    
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [isOnline, error, data]);
 
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Server Status</h1>
-        <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+      
+      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-2xl font-semibold">play.xrcraftmc.com</h2>
-            {!isOnline && (
-              <div className="text-red-500 text-sm mt-1 flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                You are currently offline
-              </div>
-            )}
-          </div>
+          <h2 className="text-2xl font-semibold">play.xrcraftmc.com</h2>
           <button 
             onClick={handleRetry}
             className={`px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 flex items-center gap-1 ${isRefreshing ? 'opacity-75' : ''}`}
             aria-label="Refresh server status"
-            disabled={isRefreshing || !isOnline}
-            title={!isOnline ? "You are offline. Connect to the internet to refresh." : "Refresh server status"}
+            disabled={isRefreshing}
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -401,23 +287,15 @@ export default function ServerStatusClient() {
             </svg>
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </button>
-        </div>        {isLoading ? (
-          <div className="flex flex-col justify-center items-center h-48">
-            <svg className="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p className="text-gray-600 dark:text-gray-400 text-center">
-              Connecting to server...
-              <br />
-              <span className="text-sm">This may take a few moments</span>
-            </p>
-            {!isOnline && (
-              <p className="mt-4 text-red-500 text-sm text-center">
-                You appear to be offline. Check your internet connection.
-              </p>
-            )}
-          </div>) : error || !data ? (
+          </div>        ) : error || !data ? (
           <div className="flex flex-col items-center justify-center h-48 text-center">
             <div className="text-red-500 text-xl mb-4">
               {error?.message || "Unable to connect to server"}
@@ -428,22 +306,14 @@ export default function ServerStatusClient() {
                 : error?.message?.includes('timed out')
                 ? "The request timed out. This could be due to server load or network issues."
                 : "The server may be offline or under maintenance. We'll keep trying to reconnect."}
-            </p>            <div className="flex flex-wrap gap-3 justify-center">
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
               <button 
                 onClick={handleRetry}
                 className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
                 disabled={isRefreshing}
               >
                 {isRefreshing ? 'Trying...' : 'Try Again'}
-              </button>
-              
-              <button 
-                onClick={tryAlternativeAPI}
-                className={`px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
-                disabled={isRefreshing || !isOnline}
-                title={!isOnline ? "You need to be online" : "Try alternative method"}
-              >
-                Try Alternative Method
               </button>
               
               <button 
