@@ -40,34 +40,45 @@ export default function HomeClient() {
   const handleHeroCopy = () => copyServerIP(setHeroCopied);
   const handleInfoCopy = () => copyServerIP(setInfoCopied);
 
+  // Check for reduced motion preference
+  const prefersReducedMotion = typeof window !== 'undefined' 
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
+
   return (
     <div className="space-y-10">
       {/* Hero Section */}
-      <section className={`relative overflow-hidden transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        {/* Background decoration */}
+      <section 
+        className={`relative overflow-hidden ${
+          prefersReducedMotion 
+            ? 'opacity-100' 
+            : `transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`
+        }`}
+      >
+        {/* Background decoration - only animate if motion is not reduced */}
         <div className="absolute inset-0 z-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('/logo.png')] bg-no-repeat bg-center bg-contain will-change-transform"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('/logo.png')] bg-no-repeat bg-center bg-contain"></div>
         </div>
         
-        <div className="relative z-10 text-center py-8 md:py-12 bg-gradient-to-r from-black-600/80 to-grey-600/60 rounded-lg shadow-2xl pixel-border overflow-hidden max-w-3xl mx-auto"
-          style={{ willChange: 'opacity, transform' }}>
-          {/* Animated particles with pre-computed positions */}
-          <div className="absolute inset-0 pointer-events-none opacity-30">
-            {particles.map((particle, i) => (
-              <div 
-                key={i}
-                className="absolute bg-white rounded-full w-2 h-2"
-                style={{
-                  top: particle.top,
-                  left: particle.left,
-                  opacity: particle.opacity,
-                  animation: `float ${particle.animationDuration} linear infinite`,
-                  animationDelay: particle.animationDelay
-                }}
-              />
-            ))}
-          </div>
-          
+        <div className="relative z-10 text-center py-8 md:py-12 bg-gradient-to-r from-black-600/80 to-grey-600/60 rounded-lg shadow-2xl pixel-border overflow-hidden max-w-3xl mx-auto">
+          {/* Animated particles with pre-computed positions - only show if animations are enabled */}
+          {!prefersReducedMotion && (
+            <div className="absolute inset-0 pointer-events-none opacity-30">
+              {particles.slice(0, 10).map((particle, i) => (
+                <div 
+                  key={i}
+                  className="absolute bg-white rounded-full w-2 h-2"
+                  style={{
+                    top: particle.top,
+                    left: particle.left,
+                    opacity: particle.opacity,
+                    animation: `float ${particle.animationDuration} linear infinite`,
+                    animationDelay: particle.animationDelay
+                  }}
+                />
+              ))}
+            </div>
+          )}
           <div className="relative z-10 flex flex-col items-center">
             {/* Main title with simplified design and logo image */}
             <div className="mb-3 text-center">
@@ -225,20 +236,23 @@ export default function HomeClient() {
         </div>
       </section>
 
-      {/* Coming Soon Section */}
+      {/* Community Section */}
       <section 
         className={`relative transition-all duration-700 delay-400 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
         style={{ willChange: 'opacity, transform' }}
       >
-        <div className="bg-gradient-to-r from-yellow-600/80 to-orange-600/80 p-6 rounded-lg shadow-lg pixel-border overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600/80 to-purple-600/80 p-6 rounded-lg shadow-lg pixel-border overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-4">
             <div className="bg-black/20 rounded-full p-3 flex-shrink-0">
-              <svg className="w-10 h-10 text-yellow-300 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <svg className="w-10 h-10 text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <div>
-              
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-white mb-2">Join Our Active Community</h3>
+              <p className="text-white/90">
+                Connect with other players, get help, and participate in community events!
+              </p>
             </div>
             <div className="flex-shrink-0 mt-4 md:mt-0">
               <a 

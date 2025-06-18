@@ -1,10 +1,13 @@
 import { Inter, Press_Start_2P, VT323, Rubik } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import dynamic from 'next/dynamic';
 import { Metadata, Viewport } from 'next';
-import AnimatedLayout from "@/components/AnimatedLayout";
+import Navbar from "@/components/Navbar";
+
+// Dynamically import components that aren't needed for initial page render
+const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
+const AnimatedLayout = dynamic(() => import('@/components/AnimatedLayout'), { ssr: true });
 
 // Fonts
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });

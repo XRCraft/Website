@@ -29,18 +29,23 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
   }, [animate]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    `https://api.mcsrvstat.us/3/${serverIp}`, 
+    `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
     fetcher, 
     {
-      refreshInterval: 60000, // Refresh every 60 seconds
-      errorRetryCount: 3,
+      refreshInterval: 120000, // Refresh every 2 minutes instead of every minute
+      errorRetryCount: 2,
       revalidateOnFocus: false,
-      dedupingInterval: 30000,
+      dedupingInterval: 60000, // Increased to reduce unnecessary fetches
       onSuccess: () => setAnimate(true),
       suspense: false,
       keepPreviousData: true,
+      revalidateIfStale: false, // Don't revalidate if data is stale for better performance
+      focusThrottleInterval: 30000, // Add throttling when tab focuses
       shouldRetryOnError: (err) => {
-        console.warn('Error in PlayerCount fetcher:', err);
+        // Only log in development
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('Error in PlayerCount fetcher:', err);
+        }
         return true; // Still retry on error
       }
     }

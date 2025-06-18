@@ -12,8 +12,8 @@ export default function AboutPage() {
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
         <h2 className="text-2xl font-semibold mb-3">What is XRCraft?</h2>
-        <p className="mb-2">XRCraft is a Minecraft server, which may be included by default.</p>
-        <p>The server is VR optimized and works best on VR and on PC.</p>
+        <p className="mb-2">XRCraft is a VR-optimized Minecraft server designed specifically for an immersive experience.</p>
+        <p>The server is carefully tuned to provide the best performance for both VR players (especially QuestCraft users) and traditional PC players.</p>
       </section>
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
@@ -25,14 +25,9 @@ export default function AboutPage() {
           </div>
           <div>
             <h3 className="font-semibold">Recommended Versions:</h3>
-            <p>1.21.1 - 1.21.5</p>
+            <p>1.21.1 - 1.21.6*</p>
           </div>
         </div>
-      </section>
-
-      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
-        <h2 className="text-2xl font-semibold mb-3">Release Status</h2>
-        <p>Not yet released. XRCraft is in development and is slated for release on the day of QuestCraft 6.0.</p>
       </section>
 
       <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
