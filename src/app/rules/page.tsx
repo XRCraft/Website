@@ -22,7 +22,8 @@ export default function RulesPage() {
     { id: 14, tag: "MINIGAMES", text: "Turn off any minimaps and freecam. Any minimap gives a unfair advantage, along with freecam." },
     { id: 15, tag: "SURVIVALIZED GAMEMODES", text: "No use of freecam. In certain situations, freecam may be useful to check builds, where it is fine to do that, but as soon as ANY player or unfair advantage like using it for far ranged attacks, or interactions, is bannable. We recommend you do not use it at all as this can be used against you." },
     { id: 16, text: "VPNs are not allowed. VPNs and proxy services are not allowed, and you may be kicked and unable to join. If you need to connect via a VPN or proxy, please contact staff privately for potential allowance." }, 
-    { id: 17, text: "Do not sell items for real money. Selling items for money is extremely dangerous, slippery slope, for everyone inolved, so we are banning this early. "}
+    { id: 17, text: "Do not sell items for real money. Selling items for money is extremely dangerous, slippery slope, for everyone inolved."},
+    { id: 18, text: "No server scouting. Server scouting means asking people to friend you to get an invite to your server, people may come up to you, but you may not come up to them."}
   ];
 
   return (
@@ -36,7 +37,6 @@ export default function RulesPage() {
           <li>Some rules only apply to specific gamemodes and are tagged accordingly (e.g., <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">(GAMEMODE)</span>).</li>
           <li>Use common sense. If something seems unfair or is banned on most servers, it will likely banned here.</li>
           <li>Staff are available to clarify rules.</li>
-          <li>Staff hierarchy exists: Owners - Admins - Senior Mods - Mods. Lower ranks have limited permissions.</li>
         </ul>
       </section>
       <section>
@@ -47,7 +47,7 @@ export default function RulesPage() {
           <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
         </section>
         
-        <ol className="list-decimal list-outside space-y-4 pl-6">
+        <ol className="list-decimal list-outside space-y-4 pl-10 ml-2">
           {rules.map((rule) => (
             <li key={rule.id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow">
               {rule.tag && (

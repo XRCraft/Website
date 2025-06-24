@@ -21,9 +21,8 @@ const fetcher = async (url: string) => {
       headers: {
         'Cache-Control': 'no-cache',
       },
-      // Add retry logic with exponential backoff
-      mode: 'cors',
-      credentials: 'omit'
+      // No need for CORS settings when using our own API
+      next: { revalidate: 0 } // Don't cache this request on the client
     });
     
     clearTimeout(timeoutId);
@@ -32,18 +31,21 @@ const fetcher = async (url: string) => {
       throw new Error(`Failed to fetch server status: ${res.status}`);
     }
     
-    return res.json();
-  } catch (error) {
+    return res.json();  } catch (error) {
     // Provide more specific error messages based on error type
     if (error instanceof TypeError && error.message.includes('NetworkError')) {
-      console.error('Network error when fetching server status - possibly CORS or connectivity issue');
-      throw new Error('Network connectivity issue. Please check your internet connection.');
+      console.error('Network error when fetching server status');
+      throw new Error('Unable to connect to server status. Please try again later.');
     } else if (typeof error === 'object' && error !== null && 'name' in error && (error as { name: string }).name === 'AbortError') {
       console.error('Request timeout when fetching server status');
-      throw new Error('Request timed out. Server may be experiencing high load.');
+      throw new Error('Request timed out. Our server or the Minecraft server might be experiencing high load.');
+    } else if (!navigator.onLine) {
+      console.error('Browser is offline');
+      throw new Error('Your device appears to be offline. Please check your internet connection.');
     } else {
       console.error('Error fetching server status:', error);
-      throw error;
+      // Provide a more user-friendly error message
+      throw new Error('Unable to fetch server status. Please try refreshing the page.');
     }
   }
 };
@@ -198,8 +200,8 @@ export default function ServerStatusClient() {
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
-    const { data, error, isLoading, mutate } = useSWR(
-    `https://api.mcsrvstat.us/3/${serverIp}`, 
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
     fetcher, 
     {
       refreshInterval: 30000, // Refresh every 30 seconds
