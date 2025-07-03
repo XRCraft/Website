@@ -23,7 +23,8 @@ export default function RulesPage() {
     { id: 15, tag: "SURVIVALIZED GAMEMODES", text: "No use of freecam. In certain situations, freecam may be useful to check builds, where it is fine to do that, but as soon as ANY player or unfair advantage like using it for far ranged attacks, or interactions, is bannable. We recommend you do not use it at all as this can be used against you." },
     { id: 16, text: "VPNs are not allowed. VPNs and proxy services are not allowed, and you may be kicked and unable to join. If you need to connect via a VPN or proxy, please contact staff privately for potential allowance." }, 
     { id: 17, text: "Do not sell items for real money. Selling items for money is extremely dangerous, slippery slope, for everyone inolved."},
-    { id: 18, text: "No server scouting. Server scouting means asking people to friend you to get an invite to your server, people may come up to you, but you may not come up to them."}
+    { id: 18, text: "No server scouting. Server scouting means asking people to friend you to get an invite to your server, people may come up to you, but you may not come up to them."},
+    { id: 19, text: "Entity and item names must be suitable for players of all ages, i.e safe-for-work. Explicit names may be changed at any time by a staff member without warning or refunds."}
   ];
 
   return (
