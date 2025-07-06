@@ -47,8 +47,8 @@ export default function Navbar() {
       className={clsx(
         'backdrop-blur-md sticky top-0 z-50 transition-all duration-300',
         scrolled
-          ? 'bg-mcbrown bg-opacity-90 shadow-lg'
-          : 'bg-mcgreen bg-opacity-60 pixel-border'
+          ? 'bg-white/10 shadow-lg border-b border-white/20'
+          : 'bg-white/5 border-b border-white/10'
       )}
     >
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -76,10 +76,8 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 className={clsx(
-                  'transition-all duration-200 px-3 py-2 rounded mc-button hover:bg-mcbrown hover:text-white',
-                  pathname === link.href
-                    ? 'bg-mcbrown text-white pixel-border'
-                    : 'text-white hover:scale-105'
+                  'glass-nav-link',
+                  pathname === link.href && 'active'
                 )}
               >
                 {link.label}
@@ -93,7 +91,10 @@ export default function Navbar() {
           <button
             id="mobile-menu-button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="ml-auto p-1 rounded-md text-white bg-mcbrown pixel-border hover:bg-mcgreen focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mcsky mc-button"
+            className={clsx(
+              'glass-btn p-2',
+              isMobileMenuOpen && 'active'
+            )}
             aria-controls="mobile-menu"
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? "Close main menu" : "Open main menu"}
@@ -114,7 +115,7 @@ export default function Navbar() {
         aria-hidden={!isMobileMenuOpen}
         aria-labelledby="mobile-menu-button"
         className={clsx(
-          'md:hidden absolute top-full left-0 right-0 backdrop-blur-md bg-mcgreen bg-opacity-80 pixel-border shadow-lg transform transition-all duration-300 overflow-hidden',
+          'md:hidden bg-white/10 backdrop-blur-md shadow-lg border-t border-white/10 transform transition-all duration-300 overflow-hidden',
           isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         )}
       >
@@ -125,8 +126,8 @@ export default function Navbar() {
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={clsx(
-                  'block px-3 py-2 rounded-md mc-button transition-all duration-200 hover:bg-mcbrown hover:text-white pixel-border',
-                  pathname === link.href ? 'bg-mcbrown text-white' : 'text-white'
+                  'glass-nav-link block w-full text-center',
+                  pathname === link.href && 'active'
                 )}
                 aria-current={pathname === link.href ? 'page' : undefined}
               >

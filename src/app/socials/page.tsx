@@ -10,7 +10,7 @@ export default function SocialsPage() {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Connect with us</h1>
 
-      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+      <section className="glass-container">
         <h2 className="text-2xl font-semibold mb-3">Official Social Media</h2>
         <ul className="list-disc list-inside space-y-2">
           <li>
@@ -25,11 +25,11 @@ export default function SocialsPage() {
         </ul>
       </section>
 
-      <section className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow">
+      <section className="glass-container">
         <h2 className="text-2xl font-semibold mb-3">Social Media Role Requirements</h2>
         <p className="mb-4">Requirements for obtaining a special role (e.g., on Discord) based on your social media presence. The profile must be linked to your Discord profile.</p>
         <div className="space-y-4">
-          <div>
+          <div className="glass-light p-4">
             <h3 className="font-semibold text-lg">YouTube</h3>
             <ul className="list-disc list-inside ml-4 space-y-1">
               <li>1K - 5K Subscribers</li>
@@ -37,11 +37,11 @@ export default function SocialsPage() {
               <li>A video about XRCraft in the last 4 months with at least 2K views</li>
             </ul>
           </div>
-          <div>
+          <div className="glass-light p-4">
             <h3 className="font-semibold text-lg">TikTok</h3>
             <p>Not currently accepting applications for TikTok roles.</p>
           </div>
-          <div>
+          <div className="glass-light p-4">
             <h3 className="font-semibold text-lg">Other Platforms</h3>
             <p>Requirements for other platforms are currently unknown. Not accepting applications at this time.</p>
           </div>

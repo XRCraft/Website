@@ -124,7 +124,7 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
 
   return (
     <span className={`font-semibold inline-flex items-center gap-2 transition-all duration-300 ${animate ? 'scale-110' : 'scale-100'}`}>
-      <span className="relative h-5 w-20 bg-black/30 rounded-full overflow-hidden">
+      <span className="relative h-5 w-20 bg-black/40 rounded-full overflow-hidden border border-white/20">
         <span 
           className={`absolute h-full rounded-full transition-all duration-700 ease-in-out ${statusColor}`} 
           style={{ width: `${percentFull}%` }}
@@ -135,7 +135,7 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
           aria-valuemax={data.players.max}
           aria-label={`${data.players.online} of ${data.players.max} players online. Status: ${statusIndicator}`}
         ></span>
-        <span className="absolute inset-0 flex items-center justify-center text-xs text-white drop-shadow-md">
+        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] [text-shadow:_0_1px_2px_rgb(0_0_0_/_80%)]">
           <span className="translate-y-px">{data.players.online} / {data.players.max}</span>
         </span>
       </span>

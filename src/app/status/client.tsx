@@ -182,7 +182,8 @@ export default function ServerStatusClient() {
   const serverIp = "play.xrcraftmc.com";
   const [,setRetryCount] = useState(0); 
   const [showRawMotd, setShowRawMotd] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedHeader, setCopiedHeader] = useState(false);
+  const [copiedJoin, setCopiedJoin] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [isOnline, setIsOnline] = useState(false);
@@ -245,10 +246,16 @@ export default function ServerStatusClient() {
     }
   };
   
-  const handleCopy = async () => {
+  const handleCopyHeader = async () => {
     await navigator.clipboard.writeText(serverIp);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setCopiedHeader(true);
+    setTimeout(() => setCopiedHeader(false), 1500);
+  };
+
+  const handleCopyJoin = async () => {
+    await navigator.clipboard.writeText(serverIp);
+    setCopiedJoin(true);
+    setTimeout(() => setCopiedJoin(false), 1500);
   };
   
   // Get MOTD lines, using our exact demo if none exists
@@ -270,12 +277,23 @@ export default function ServerStatusClient() {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">Server Status</h1>
       
-      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+      <div className="glass-container">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">play.xrcraftmc.com</h2>
+          <button
+            onClick={handleCopyHeader}
+            className={`text-2xl font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer relative ${copiedHeader ? 'ring-2 ring-green-400 rounded px-2 py-1' : ''}`}
+            title="Click to copy server IP"
+          >
+            play.xrcraftmc.com
+            {copiedHeader && (
+              <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-50 whitespace-nowrap animate-pulse">
+                Copied!
+              </span>
+            )}
+          </button>
           <button 
             onClick={handleRetry}
-            className={`px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 flex items-center gap-1 ${isRefreshing ? 'opacity-75' : ''}`}
+            className={`glass-btn ${isRefreshing ? 'opacity-75' : ''}`}
             aria-label="Refresh server status"
             disabled={isRefreshing}
           >
@@ -313,7 +331,7 @@ export default function ServerStatusClient() {
             <div className="flex flex-wrap gap-3 justify-center">
               <button 
                 onClick={handleRetry}
-                className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
+                className={`glass-btn ${isRefreshing ? 'opacity-75' : ''}`}
                 disabled={isRefreshing}
               >
                 {isRefreshing ? 'Trying...' : 'Try Again'}
@@ -321,7 +339,7 @@ export default function ServerStatusClient() {
               
               <button 
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition duration-200"
+                className="glass-btn"
                 aria-label="Reload the page"
               >
                 Reload Page
@@ -339,7 +357,7 @@ export default function ServerStatusClient() {
             </p>
             <button 
               onClick={handleRetry}
-              className={`px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition duration-200 ${isRefreshing ? 'opacity-75' : ''}`}
+              className={`glass-btn ${isRefreshing ? 'opacity-75' : ''}`}
               disabled={isRefreshing}
             >
               {isRefreshing ? 'Checking...' : 'Check Again'}
@@ -370,7 +388,7 @@ export default function ServerStatusClient() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold mb-2">Message of the Day</h3>
-                <div className="bg-gray-200 dark:bg-gray-700 p-3 rounded font-minecraft border-2 border-gray-300 dark:border-gray-600 shadow-inner overflow-hidden">
+                <div className="glass-light p-3 rounded font-minecraft overflow-hidden">
                   {showRawMotd ? (
                     <div className="leading-tight text-xs font-mono overflow-x-auto whitespace-pre">
                       {getMotdLines().map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
@@ -400,19 +418,19 @@ export default function ServerStatusClient() {
                         motdContainer.classList.toggle('hidden');
                       }
                     }}
-                    className="text-xs text-blue-500 hover:text-blue-700 underline mr-4"
+                    className="glass-btn text-sm mr-4"
                   >
                     Show in-game preview
                   </button>
                   
                   <button 
                     onClick={() => setShowRawMotd(!showRawMotd)}
-                    className="text-xs text-blue-500 hover:text-blue-700 underline"
+                    className="glass-btn text-sm"
                   >
                     {showRawMotd ? 'Show formatted MOTD' : 'Show raw format'}
                   </button>
                   
-                  <div id="minecraft-motd-preview" className="hidden mt-3 p-4 bg-gray-900 text-white rounded border border-gray-700 overflow-hidden max-w-md mx-auto shadow-lg">
+                  <div id="minecraft-motd-preview" className="hidden mt-3 p-4 glass-container text-white rounded overflow-hidden max-w-md mx-auto">
                     <div className="flex items-center mb-3">
                       <div className="w-8 h-8 mr-2 bg-green-500 rounded-sm flex-shrink-0"></div>
                       <div>
@@ -422,7 +440,7 @@ export default function ServerStatusClient() {
                     </div>
                     
                     {/* Minecraft style MOTD with exact color parsing */}
-                    <div className="font-minecraft text-sm mb-3 bg-gray-950 p-2 rounded">
+                    <div className="font-minecraft text-sm mb-3 glass-light p-2 rounded">
                       {getMotdLines().map((line: string, idx: number) => (
                         <div 
                           key={idx} 
@@ -444,7 +462,7 @@ export default function ServerStatusClient() {
               {data.players.online > 0 && data.players.list && (
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Online Players</h3>
-                  <div className="bg-gray-200 dark:bg-gray-700 p-3 rounded max-h-40 overflow-y-auto">
+                  <div className="glass-light p-3 rounded max-h-40 overflow-y-auto">
                     <ul className="space-y-1">
                       {data.players.list.map((player: Player, index: number) => (
                         <li key={index} className="flex items-center">
@@ -480,33 +498,33 @@ export default function ServerStatusClient() {
         )}
       </div>
 
-      <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg shadow mt-6">
+      <div className="glass-container">
         <h2 className="text-xl font-semibold mb-4">Join the Server</h2>
         <div className="mb-4 flex items-center flex-wrap">
           <p className="mr-2">To join the server, add</p>
           <button
-            onClick={handleCopy}
-            className={`relative bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded ml-1 cursor-pointer border border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 shadow-sm hover:bg-blue-100 dark:hover:bg-blue-900 active:scale-95 ${copied ? 'ring-2 ring-green-400' : ''}`}
+            onClick={handleCopyJoin}
+            className={`relative glass-light px-2 py-1 rounded ml-1 cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 active:scale-95 ${copiedJoin ? 'ring-2 ring-green-400' : ''}`}
             title="Click to copy IP"
             type="button"
           >
             <span className="flex items-center gap-1">
               <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-              <code className="font-mono text-base">{serverIp}</code>
+              <code className="font-mono text-base text-blue-600 dark:text-blue-400">{serverIp}</code>
             </span>
-            {copied && (
-              <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg animate-fade-in-out z-10 whitespace-nowrap">Copied!</span>
+            {copiedJoin && (
+              <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-50 whitespace-nowrap animate-pulse">Copied!</span>
             )}
           </button>
           <p className="ml-2">to your Minecraft server list.</p>
         </div>
         
         <div className="space-y-4">
-          <div>
+          <div className="glass-light p-4 rounded">
             <h3 className="font-semibold">Supported Versions:</h3>
             <p>1.18.2 - 1.21.5</p>
           </div>
-          <div>
+          <div className="glass-light p-4 rounded">
             <h3 className="font-semibold">Recommended Mods:</h3>
             <ul className="list-disc list-inside">
               <li>SimpleVoiceChat</li>

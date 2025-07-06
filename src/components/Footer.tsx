@@ -112,10 +112,10 @@ export default function Footer() {
                 >
                   <span className="flex items-center gap-1">
                     <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                    <code className="font-mono text-base text-blue-300">{serverIp}</code>
+                    <code className="font-mono text-base text-blue-600 dark:text-blue-400">{serverIp}</code>
                   </span>
                   {copied && (
-                    <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-10 whitespace-nowrap">
+                    <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-50 whitespace-nowrap animate-pulse">
                       Copied!
                     </span>
                   )}

@@ -117,7 +117,7 @@ export default function RootLayout({
             Skip to main content
           </a>
           <Navbar />
-          <main id="main-content" className="flex-grow container mx-auto px-4 py-8 w-full">
+          <main id="main-content" className="flex-grow container mx-auto px-4 pt-20 pb-8 w-full">
             <AnimatedLayout>{children}</AnimatedLayout>
           </main>
           <Footer />

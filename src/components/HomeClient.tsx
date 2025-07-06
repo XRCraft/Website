@@ -49,7 +49,7 @@ export default function HomeClient() {
     <div className="space-y-10">
       {/* Hero Section */}
       <section 
-        className={`relative overflow-hidden ${
+        className={`relative overflow-visible p-4 ${
           prefersReducedMotion 
             ? 'opacity-100' 
             : `transition-all duration-700 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`
@@ -60,7 +60,7 @@ export default function HomeClient() {
           <div className="absolute top-0 left-0 w-full h-full bg-[url('/logo.png')] bg-no-repeat bg-center bg-contain"></div>
         </div>
         
-        <div className="relative z-10 text-center py-8 md:py-12 bg-gradient-to-r from-black-600/80 to-grey-600/60 rounded-lg shadow-2xl pixel-border overflow-hidden max-w-3xl mx-auto">
+        <div className="relative z-10 text-center py-8 md:py-12 bg-gradient-to-r from-black-600/80 to-grey-600/60 rounded-lg shadow-2xl pixel-border max-w-3xl mx-auto m-4">
           {/* Animated particles with pre-computed positions - only show if animations are enabled */}
           {!prefersReducedMotion && (
             <div className="absolute inset-0 pointer-events-none opacity-30">
@@ -83,7 +83,7 @@ export default function HomeClient() {
             {/* Main title with simplified design and logo image */}
             <div className="mb-3 text-center">
               <div className="relative">
-                <h2 className="text-4xl md:text-6xl text-white font-minecraft mb-2 relative z-10">
+                <h2 className="text-4xl md:text-6xl text-white font-bold mb-2 relative z-10">
                   Welcome to
                 </h2>
               </div>
@@ -100,7 +100,7 @@ export default function HomeClient() {
             </div>
             
             {/* Subtitle in dark box as shown in screenshot */}
-            <div className="bg-black/40 py-1 px-8 rounded-md inline-block mb-5">
+            <div className="bg-black/20 py-1 px-8 rounded-md inline-block mb-5">
               <p className="text-lg md:text-xl text-white">
                 VR Optimized Minecraft Server
               </p>
@@ -139,7 +139,7 @@ export default function HomeClient() {
                 </div>
                 
                 {/* Player count row */}
-                <div className="bg-black/30 px-4 py-3 rounded flex items-center justify-between">
+                <div className="bg-black/10 px-4 py-3 rounded flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     <span className="text-white">Players Online:</span>

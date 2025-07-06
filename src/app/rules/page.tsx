@@ -34,26 +34,27 @@ export default function RulesPage() {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-center text-blue-600 dark:text-blue-400">XRCraftMC Server Rules</h1>
 
-      <section className="bg-yellow-100 dark:bg-yellow-900 border-l-4 border-yellow-500 dark:border-yellow-600 p-4 rounded-md shadow">
-        <h2 className="text-xl font-semibold text-yellow-800 dark:text-yellow-300 mb-2">Important Notes</h2>
-        <ul className="list-disc list-inside space-y-1 text-yellow-700 dark:text-yellow-200">
+      <section className="glass-container border-l-4 border-yellow-500 dark:border-yellow-600">
+        <h2 className="text-xl font-semibold text-yellow-600 dark:text-yellow-400 mb-2">Important Notes</h2>
+        <ul className="list-disc list-inside space-y-1 text-yellow-600 dark:text-yellow-300">
           <li>Rules may be updated at any time. Check back regularly. Pleading ignorance is not a valid excuse.</li>
           <li>Some rules only apply to specific gamemodes and are tagged accordingly (e.g., <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">(GAMEMODE)</span>).</li>
           <li>Use common sense. If something seems unfair or is banned on most servers, it will likely banned here.</li>
           <li>Staff are available to clarify rules.</li>
         </ul>
       </section>
+      
       <section>
         <h2 className="text-2xl font-semibold mb-4">General & Gamemode Rules</h2>
         
-        <section className="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-600 p-4 rounded-md shadow mb-4">
-          <h3 className="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Mod Forewarning</h3>
-          <p className="text-red-700 dark:text-red-200">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
+        <section className="glass-container border-l-4 border-red-500 dark:border-red-600 mb-4">
+          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">Mod Forewarning</h3>
+          <p className="text-red-600 dark:text-red-300">Mods that may classify as cheats such as Freecam and player finders may be bannable and is specific to each case of use if it is.</p>
         </section>
         
         <ol className="list-decimal list-outside space-y-4 pl-10 ml-2">
           {rules.map((rule) => (
-            <li key={rule.id} className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow">
+            <li key={rule.id} className="glass-light p-4">
               {rule.tag && (
                 <span className="font-mono text-xs bg-blue-200 dark:bg-blue-700 text-blue-800 dark:text-blue-100 px-2 py-0.5 rounded mr-2">
                   {rule.tag}
