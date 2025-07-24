@@ -1,21 +1,5 @@
-/*
- * XRCraftMC Global Styles - Optimized Version
- * 
- * Performance Optimizations Applied:
- * - Consolidated duplicate styles between html/body elements
- * - Used transform3d for GPU-accelerated animations  
- * - Added will-change property for better animation performance
- * - Consolidated similar component styles with DRY approach
- * - Optimized CSS custom properties organization
- * - Reduced selector specificity where possible
- * - Consolidated media queries and light mode overrides
- * - Used inset shorthand instead of top/left/right/bottom
- * - Streamlined navigation component styles
- * - Removed redundant transitions and properties
- */
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rubik:wght@400;500;600;700&display=swap');
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rubik:wght@400;500;600;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') layer(fonts);
+@import "tailwindcss" layer(base);
 
 /* Optimized base styles - consolidated html/body */
 html {
@@ -24,6 +8,7 @@ html {
   font-feature-settings: "liga" 1, "kern" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-display: swap;
 }
 
 body {
@@ -31,69 +16,49 @@ body {
   color: #f5f5f5;
   background-image: 
     linear-gradient(135deg, rgba(94, 124, 22, 0.1) 0%, transparent 50%),
-    linear-gradient(to bottom, transparent 85%, rgba(94, 124, 22, 0.6) 100%), 
     url('/grass.png');
-  background-repeat: no-repeat, repeat-x, repeat-x;
-  background-size: 100% 100%, auto 40px, auto 40px;
-  background-position: top, bottom, bottom;
+  background-repeat: no-repeat, repeat-x;
+  background-size: 100% 100%, auto 40px;
+  background-position: top, bottom;
   letter-spacing: 0.3px;
   line-height: 1.6;
   font-weight: 400;
   margin: 0;
   padding: 0;
   position: relative;
+  contain: layout style paint;
 }
 
-/* Optimized background animation with better performance */
+/* High-performance background animation - optimized blur */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
     url('/bgd.png') center center / cover no-repeat;
-  filter: blur(18px) brightness(0.75) contrast(1.2) saturate(1.1);
-  opacity: 0.9;
+  filter: blur(12px) brightness(0.8);
+  opacity: 0.8;
   pointer-events: none;
-  will-change: transform, filter;
-  animation: modern-float 20s ease-in-out infinite alternate;
+  will-change: transform;
+  animation: fast-float 15s linear infinite;
+  contain: strict;
 }
 
-/* Optimized keyframes with transform3d for GPU acceleration */
-@keyframes modern-float {
-  0% {
-    transform: translate3d(-0.3%, -0.3%, 0) scale(1.01) rotate(0deg);
-    filter: blur(18px) brightness(0.75) contrast(1.2) hue-rotate(0deg) saturate(1.1);
-  }
-  50% {
-    transform: translate3d(0%, 0%, 0) scale(1.02) rotate(0.5deg);
-    filter: blur(15px) brightness(0.8) contrast(1.15) hue-rotate(2deg) saturate(1.2);
-  }
-  100% {
-    transform: translate3d(0.3%, 0.3%, 0) scale(1) rotate(0deg);
-    filter: blur(20px) brightness(0.7) contrast(1.25) hue-rotate(0deg) saturate(1.1);
-  }
+/* Ultra-fast keyframes - transform-only for 60fps performance */
+@keyframes fast-float {
+  0% { transform: translate3d(-0.2%, -0.2%, 0) rotate(0deg); }
+  25% { transform: translate3d(0.2%, -0.1%, 0) rotate(0.3deg); }
+  50% { transform: translate3d(0.1%, 0.2%, 0) rotate(0deg); }
+  75% { transform: translate3d(-0.1%, 0.1%, 0) rotate(-0.3deg); }
+  100% { transform: translate3d(-0.2%, -0.2%, 0) rotate(0deg); }
 }
 
-@keyframes pixel-pulse {
-  0%, 100% {
-    transform: scale3d(1, 1, 1);
-    box-shadow: 
-      0 0 0 2px rgba(68, 68, 68, 0.8),
-      0 0 0 4px rgba(17, 17, 17, 0.6),
-      0 0 20px rgba(59, 130, 246, 0.1);
-  }
-  50% {
-    transform: scale3d(1.02, 1.02, 1);
-    box-shadow: 
-      0 0 0 2px rgba(68, 68, 68, 1),
-      0 0 0 4px rgba(34, 34, 34, 0.8),
-      0 0 30px rgba(59, 130, 246, 0.3),
-      0 0 50px rgba(59, 130, 246, 0.1);
-  }
+@keyframes fast-pulse {
+  0%, 100% { transform: scale3d(1, 1, 1); }
+  50% { transform: scale3d(1.01, 1.01, 1); }
 }
 
 @media (prefers-color-scheme: light) {
@@ -106,17 +71,15 @@ body::before {
     color: #1a1a1a;
     background-image: 
       linear-gradient(135deg, rgba(94, 124, 22, 0.05) 0%, transparent 50%),
-      linear-gradient(to bottom, transparent 85%, rgba(94, 124, 22, 0.4) 100%), 
       url('/grass.png');
   }
   body::before {
     background: 
-      radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
-      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
-      radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.02) 0%, transparent 40%),
+      radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
+      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 60%),
       url('/bgl.png') center center / cover no-repeat;
-    filter: blur(15px) brightness(1.15) contrast(0.85) saturate(0.9);
-    opacity: 0.7;
+    filter: blur(10px) brightness(1.1);
+    opacity: 0.6;
   }
 }
 
@@ -168,7 +131,7 @@ body::before {
   --border-radius-xl: 1rem;
 }
 
-/* Base component styles - consolidated and optimized */
+/* High-performance component styles - optimized selectors */
 .pixel-border,
 .glass-container,
 .glass-light {
@@ -177,9 +140,10 @@ body::before {
   background: var(--surface);
   box-shadow: var(--shadow-md);
   border-radius: var(--border-radius);
-  transition: all 0.3s var(--ease-smooth);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   overflow: hidden;
+  contain: layout style;
 }
 
 .pixel-border::before,
@@ -191,15 +155,14 @@ body::before {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .pixel-border:hover,
 .glass-container:hover {
   border-color: var(--primary);
-  background: var(--surface-hover);
   box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.2);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .pixel-border:hover::before,
@@ -244,7 +207,7 @@ body::before {
   box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.1);
 }
 
-/* Optimized button system - consolidated similar styles */
+/* Ultra-fast button system - optimized for performance */
 .mc-button,
 .glass-btn {
   position: relative;
@@ -252,15 +215,14 @@ body::before {
   border-radius: var(--border-radius);
   color: white;
   font-weight: 500;
-  overflow: hidden;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  transition: all 0.3s var(--ease-smooth);
-  transform-style: preserve-3d;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   will-change: transform;
+  contain: layout style;
 }
 
 .mc-button {
@@ -274,31 +236,10 @@ body::before {
   color: var(--text-muted);
 }
 
-.mc-button::before,
-.glass-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.glass-btn::before {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
-}
-
-.mc-button:hover::before,
-.glass-btn:hover::before {
-  opacity: 1;
-}
-
 .glass-btn:hover {
-  background: var(--surface);
   border-color: var(--primary);
   color: var(--primary);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.2);
 }
 
@@ -307,47 +248,23 @@ body::before {
   transform: translateY(1px) scale(0.98);
 }
 
-/* Button after elements for depth effect */
-.mc-button::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.2), transparent);
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
-  transition: all 0.3s ease;
-}
-
-.mc-button:active::after {
-  bottom: -1px;
-  height: 1px;
-}
-
-/* Button states - optimized active/hover combinations */
+/* Simplified button states - performance optimized */
 .mc-button.active {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   box-shadow: var(--shadow-md), 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
 .mc-button.active:hover {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-  transform: translateY(-1px) scale(1.02);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-lg), 0 0 25px rgba(59, 130, 246, 0.4);
 }
 
 .glass-btn.active {
-  background: var(--surface);
   border-color: var(--primary);
   color: var(--primary);
-  backdrop-filter: blur(20px);
   box-shadow: var(--shadow-md), 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
 .glass-btn.active:hover {
-  background: var(--surface-hover);
-  backdrop-filter: blur(25px);
   box-shadow: var(--shadow-lg), 0 0 25px rgba(59, 130, 246, 0.4);
   transform: translateY(-1px);
 }
@@ -360,14 +277,10 @@ body::before {
 }
 
 .glass-btn:disabled:hover {
-  background: var(--surface-light);
-  border-color: var(--border-light);
-  color: var(--text-muted);
   transform: none;
-  box-shadow: var(--shadow-md);
 }
 
-/* Consolidated navigation system - DRY approach */
+/* High-performance navigation system */
 .nav-link,
 .glass-nav-link,
 .tab-link,
@@ -375,12 +288,12 @@ body::before {
   position: relative;
   padding: 0.75rem 1rem;
   border-radius: var(--border-radius);
-  transition: all 0.3s var(--ease-smooth);
+  transition: transform 0.15s ease, color 0.15s ease, background-color 0.15s ease;
   color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   background: transparent;
-  will-change: transform;
+  contain: layout style;
 }
 
 /* Hover states */
@@ -614,85 +527,16 @@ body::before {
   outline-offset: 2px;
 }
 
-/* Optimized light mode - consolidated overrides */
+/* Ultra-fast light mode - minimal overrides */
 @media (prefers-color-scheme: light) {
   body {
     background-color: #fafafa;
     color: #1a1a1a;
-    background-image: 
-      linear-gradient(135deg, rgba(94, 124, 22, 0.05) 0%, transparent 50%),
-      linear-gradient(to bottom, transparent 85%, rgba(94, 124, 22, 0.4) 100%), 
-      url('/grass.png');
   }
   
   body::before {
-    background: 
-      radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
-      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
-      radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.02) 0%, transparent 40%),
-      url('/bgl.png') center center / cover no-repeat;
-    filter: blur(15px) brightness(1.15) contrast(0.85) saturate(0.9);
-    opacity: 0.7;
-  }
-  
-  /* Text content readability improvements */
-  .pixel-border h2,
-  .pixel-border h3,
-  .pixel-border p,
-  .pixel-border span,
-  .pixel-border li,
-  .mc-card h2,
-  .mc-card h3,
-  .mc-card p,
-  .mc-card span,
-  .mc-card li {
-    color: #374151 !important;
-  }
-  
-  .pixel-border a,
-  .mc-card a {
-    color: #2563eb !important;
-  }
-  
-  /* Interactive elements visibility fixes */
-  .glass-btn,
-  .mc-button,
-  button {
-    background: rgba(0, 0, 0, 0.1) !important;
-    color: #374151 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-  }
-  
-  .glass-btn:hover,
-  .mc-button:hover,
-  button:hover {
-    background: rgba(0, 0, 0, 0.2) !important;
-    color: #1f2937 !important;
-    border-color: #2563eb !important;
-  }
-  
-  .nav-link,
-  .glass-nav-link {
-    color: #374151 !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-    border-color: rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .nav-link:hover,
-  .glass-nav-link:hover {
-    background: rgba(0, 0, 0, 0.1) !important;
-    color: #1f2937 !important;
-    border-color: #2563eb !important;
-  }
-  
-  .nav-link.active {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: var(--primary-dark) !important;
-  }
-  
-  .nav-link.active:hover {
-    background: rgba(59, 130, 246, 0.2) !important;
-    color: var(--primary-dark) !important;
+    background: url('/bgl.png') center center / cover no-repeat;
+    opacity: 0.6;
   }
 }
 
