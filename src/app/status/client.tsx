@@ -65,135 +65,129 @@ function cleanMotdText(text: string): string {
 function parseMinecraftColors(text: string) {
   if (!text) return "";
   
-  // Special handling for problematic interleaved formatting codes
-  if (text.includes('§l') && text.split('§l').length > 10) {
-    const cleanText = cleanMotdText(text);
-    return `<span style="font-weight:bold; color:#FFAA00">${cleanText}</span>`;
-  }
+  // Color codes mapping
+  const colorMap: Record<string, string> = {
+    '0': '#000000', // Black
+    '1': '#0000AA', // Dark Blue
+    '2': '#00AA00', // Dark Green
+    '3': '#00AAAA', // Dark Aqua
+    '4': '#AA0000', // Dark Red
+    '5': '#AA00AA', // Dark Purple
+    '6': '#FFAA00', // Gold
+    '7': '#AAAAAA', // Gray
+    '8': '#555555', // Dark Gray
+    '9': '#5555FF', // Blue
+    'a': '#55FF55', // Green
+    'b': '#55FFFF', // Aqua
+    'c': '#FF5555', // Red
+    'd': '#FF55FF', // Light Purple
+    'e': '#FFFF55', // Yellow
+    'f': '#FFFFFF', // White
+  };
   
-  // Special case for the second MOTD line with emojis and gradient text
-  if (text.includes('🎮') && text.includes('Parkour')) {
-    // For the second line with colored emojis and gradient text:
-    // XRCraft Network uses this pattern:
-    // §c🎮 [Gradient colored text] §e🎮
-    
-    const cleanText = cleanMotdText(text);
-    const firstEmojiIndex = cleanText.indexOf('\ud83c\udfae');
-    const lastEmojiIndex = cleanText.lastIndexOf('\ud83c\udfae');
-    if (firstEmojiIndex !== -1 && lastEmojiIndex !== -1 && firstEmojiIndex !== lastEmojiIndex) {
-      const betweenEmojis = cleanText.substring(firstEmojiIndex + 1, lastEmojiIndex).trim();
-      
-      // Apply gradient to the text between emojis (like "Parkour is open!")
-      // Generate a gradient from FF5E55 to FFED55
-      const chars = betweenEmojis.split('');
-      const startColor = parseInt('FF5E55', 16);
-      const endColor = parseInt('FFED55', 16);
-      const step = (endColor - startColor) / (chars.length || 1);
-      
-      let gradientHtml = '';
-      chars.forEach((char, i) => {
-        if (char === ' ') {
-          gradientHtml += ' ';
-        } else {
-          const color = Math.round(startColor + step * i).toString(16).padStart(6, '0');
-          gradientHtml += `<span style="color:#${color}">${char}</span>`;
-        }
-      });
-      
-      return `<span style="color:#FF5555">🎮</span> ${gradientHtml} <span style="color:#FFAA00">🎮</span>`;
-    }
-  }
-    // For the first line with server name and version
-  if (text.includes('XRCraft Network') && text.includes('[')) {
-    const cleanText = cleanMotdText(text);
-    
-    // Find the parts
-    const versionStart = cleanText.indexOf('[');
-    const versionEnd = cleanText.indexOf(']');
-    
-    if (versionStart !== -1 && versionEnd !== -1) {
-      const serverName = cleanText.substring(0, versionStart).trim();
-      const versionText = cleanText.substring(versionStart, versionEnd + 1);
-      
-      // Format with proper colors
-      return `<span style="color:#FFAA00; font-weight:bold">${serverName}</span> <span style="color:#FF5555">${versionText}</span>`;
-    }
-  }
-  
-  // Default processing for other text
+  // Formatting codes mapping
+  const formatMap: Record<string, string> = {
+    'l': 'font-weight:bold', // Bold
+    'o': 'font-style:italic', // Italic
+    'n': 'text-decoration:underline', // Underline
+    'm': 'text-decoration:line-through', // Strikethrough
+    'k': 'animation:obfuscated 0.1s infinite', // Obfuscated (simplified)
+  };
+
   let result = '';
   let i = 0;
+  let openSpans = 0; // Track open spans to properly close them
+  let currentColor = '';
+  let currentFormats: string[] = [];
   
+  const openSpan = (styles: string) => {
+    result += `<span style="${styles}">`;
+    openSpans++;
+  };
+  
+  const closeSpan = () => {
+    if (openSpans > 0) {
+      result += '</span>';
+      openSpans--;
+    }
+  };
+  
+  const closeAllSpans = () => {
+    while (openSpans > 0) {
+      closeSpan();
+    }
+  };
+  
+  const applyCurrentStyles = () => {
+    if (currentColor || currentFormats.length > 0) {
+      const styles = [];
+      if (currentColor) styles.push(`color:${currentColor}`);
+      styles.push(...currentFormats);
+      openSpan(styles.join(';'));
+    }
+  };
+
   while (i < text.length) {
-    // Handle §r reset sequence
-    if (text.slice(i, i+2) === '§r') {
+    // Handle Minecraft formatting codes
+    if ((text[i] === '§' || text[i] === '\u00a7') && i + 1 < text.length) {
+      const code = text[i + 1].toLowerCase();
+      
+      // Handle reset code
+      if (code === 'r') {
+        closeAllSpans();
+        currentColor = '';
+        currentFormats = [];
+        i += 2;
+        continue;
+      }
+      
+      // Handle hex color codes §#RRGGBB
+      if (code === '#' && i + 8 <= text.length) {
+        const hexColor = text.slice(i + 2, i + 8);
+        if (/^[0-9A-Fa-f]{6}$/.test(hexColor)) {
+          closeAllSpans();
+          currentColor = `#${hexColor}`;
+          currentFormats = []; // Reset formatting when color changes
+          applyCurrentStyles();
+          i += 8;
+          continue;
+        }
+      }
+      
+      // Handle standard color codes
+      if (colorMap[code]) {
+        closeAllSpans();
+        currentColor = colorMap[code];
+        currentFormats = []; // Reset formatting when color changes
+        applyCurrentStyles();
+        i += 2;
+        continue;
+      }
+      
+      // Handle formatting codes
+      if (formatMap[code]) {
+        const format = formatMap[code];
+        if (!currentFormats.includes(format)) {
+          closeAllSpans();
+          currentFormats.push(format);
+          applyCurrentStyles();
+        }
+        i += 2;
+        continue;
+      }
+      
+      // Skip unknown codes
       i += 2;
       continue;
     }
     
-    // Handle hex color codes in the format §#RRGGBB
-    if (text.slice(i, i+2) === '§#' && i+8 <= text.length) {
-      const hexColor = text.slice(i+2, i+8);
-      const nextChar = text[i+8] || '';
-      
-      // Add the colored character
-      result += `<span style="color:#${hexColor}">${nextChar}</span>`;
-      i += 9; // Move past the color code and the character
-      continue;
-    }
-      // Handle standard Minecraft color codes §e, §c, etc. and formatting codes
-    if (text[i] === '\u00a7' || text[i] === '§') {
-      const formatCharacter = i+1 < text.length ? text[i+1].toLowerCase() : '';
-      
-      // Color codes
-      const colorMap: Record<string, string> = {
-        '0': '#000000', // Black
-        '1': '#0000AA', // Dark Blue
-        '2': '#00AA00', // Dark Green
-        '3': '#00AAAA', // Dark Aqua
-        '4': '#AA0000', // Dark Red
-        '5': '#AA00AA', // Dark Purple
-        '6': '#FFAA00', // Gold
-        '7': '#AAAAAA', // Gray
-        '8': '#555555', // Dark Gray
-        '9': '#5555FF', // Blue
-        'a': '#55FF55', // Green
-        'b': '#55FFFF', // Aqua
-        'c': '#FF5555', // Red
-        'd': '#FF55FF', // Light Purple
-        'e': '#FFFF55', // Yellow
-        'f': '#FFFFFF', // White
-      };
-      
-      // Formatting codes
-      const formatMap: Record<string, string> = {
-        'l': 'font-weight:bold', // Bold
-        'o': 'font-style:italic', // Italic
-        'n': 'text-decoration:underline', // Underline
-        'm': 'text-decoration:line-through', // Strikethrough
-        'k': 'animation:obfuscated 0.1s infinite', // Obfuscated (simplified)
-      };
-      
-      if (colorMap[formatCharacter]) {
-        i += 2; // Skip over the color code
-        result += `<span style="color:${colorMap[formatCharacter]}">`;
-      } else if (formatMap[formatCharacter]) {
-        i += 2; // Skip over the formatting code
-        result += `<span style="${formatMap[formatCharacter]}">`;
-      } else if (formatCharacter === 'r') {
-        i += 2; // Skip over the reset code
-        result += '</span>'; // Close any open spans
-      } else {
-        i += 2; // Skip over unknown formatting codes
-      }
-      
-      continue;
-    }
-    
-    // If no specific formatting was handled, just add the character
+    // Add regular character
     result += text[i];
     i++;
   }
+  
+  // Close any remaining spans
+  closeAllSpans();
   
   return result;
 }
