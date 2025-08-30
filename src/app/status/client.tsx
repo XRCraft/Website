@@ -52,13 +52,24 @@ const fetcher = async (url: string) => {
 
 // Function to create a clean string representation from MOTD with color codes stripped
 function cleanMotdText(text: string): string {
-  // Remove color codes and formatting codes
-  return text.replace(/§[0-9a-fklmnor#]([0-9A-F]{6})?/gi, '');
+  if (!text) return '';
+  
+  // Remove all Minecraft formatting codes
+  return text
+    .replace(/§[0-9a-fklmnor]/gi, '') // Standard codes (colors and formatting)
+    .replace(/§#[0-9A-F]{6}/gi, '') // Hex codes
+    .trim();
 }
 
 // Function to parse Minecraft color codes in the format used by XRCraftMC
 function parseMinecraftColors(text: string) {
   if (!text) return "";
+  
+  // Special handling for problematic interleaved formatting codes
+  if (text.includes('§l') && text.split('§l').length > 10) {
+    const cleanText = cleanMotdText(text);
+    return `<span style="font-weight:bold; color:#FFAA00">${cleanText}</span>`;
+  }
   
   // Special case for the second MOTD line with emojis and gradient text
   if (text.includes('🎮') && text.includes('Parkour')) {
@@ -130,9 +141,11 @@ function parseMinecraftColors(text: string) {
       i += 9; // Move past the color code and the character
       continue;
     }
-      // Handle standard Minecraft color codes §e, §c, etc.
+      // Handle standard Minecraft color codes §e, §c, etc. and formatting codes
     if (text[i] === '\u00a7' || text[i] === '§') {
-      const colorCharacter = i+1 < text.length ? text[i+1].toLowerCase() : '';
+      const formatCharacter = i+1 < text.length ? text[i+1].toLowerCase() : '';
+      
+      // Color codes
       const colorMap: Record<string, string> = {
         '0': '#000000', // Black
         '1': '#0000AA', // Dark Blue
@@ -152,11 +165,26 @@ function parseMinecraftColors(text: string) {
         'f': '#FFFFFF', // White
       };
       
-      if (colorMap[colorCharacter]) {
+      // Formatting codes
+      const formatMap: Record<string, string> = {
+        'l': 'font-weight:bold', // Bold
+        'o': 'font-style:italic', // Italic
+        'n': 'text-decoration:underline', // Underline
+        'm': 'text-decoration:line-through', // Strikethrough
+        'k': 'animation:obfuscated 0.1s infinite', // Obfuscated (simplified)
+      };
+      
+      if (colorMap[formatCharacter]) {
         i += 2; // Skip over the color code
-        result += `<span style="color:${colorMap[colorCharacter]}">`;
-      } else {
+        result += `<span style="color:${colorMap[formatCharacter]}">`;
+      } else if (formatMap[formatCharacter]) {
         i += 2; // Skip over the formatting code
+        result += `<span style="${formatMap[formatCharacter]}">`;
+      } else if (formatCharacter === 'r') {
+        i += 2; // Skip over the reset code
+        result += '</span>'; // Close any open spans
+      } else {
+        i += 2; // Skip over unknown formatting codes
       }
       
       continue;

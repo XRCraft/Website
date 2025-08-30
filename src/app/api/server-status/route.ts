@@ -39,6 +39,24 @@ let lastFetch = 0;
 let lastIp = '';
 let requestsInProgress: Map<string, Promise<Response>> = new Map();
 
+/**
+ * Cleans Minecraft formatting codes from MOTD text
+ * Removes all § codes including colors (§a-f, §0-9) and formatting (§l, §o, §n, §m, §k, §r)
+ */
+function cleanMotdLine(text: string): string {
+  if (!text) return '';
+  
+  // Remove all Minecraft formatting codes
+  // This includes:
+  // - Color codes: §0-9, §a-f
+  // - Formatting codes: §l (bold), §o (italic), §n (underline), §m (strikethrough), §k (obfuscated), §r (reset)
+  // - Hex color codes: §#RRGGBB
+  return text
+    .replace(/§[0-9a-fklmnor]/gi, '') // Standard codes
+    .replace(/§#[0-9A-F]{6}/gi, '') // Hex codes
+    .trim();
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const serverIp = searchParams.get('ip');
@@ -53,6 +71,11 @@ export async function GET(request: NextRequest) {
   // Return cached data if it's fresh and for the same IP
   const now = Date.now();
   if (cachedData && lastIp === serverIp && (now - lastFetch < CACHE_TIME)) {
+    // Ensure cached data has clean MOTD
+    if (cachedData.motd && cachedData.motd.raw && !cachedData.motd.clean) {
+      cachedData.motd.clean = cachedData.motd.raw.map((line: string) => cleanMotdLine(line));
+    }
+    
     // Enhance response with cache info
     return NextResponse.json(
       { ...cachedData, cache: { hit: true, age: Math.floor((now - lastFetch) / 1000) } },
@@ -112,6 +135,11 @@ export async function GET(request: NextRequest) {
     }
     
     const data = await response.json();
+    
+    // Process and clean MOTD if it exists
+    if (data.motd && data.motd.raw) {
+      data.motd.clean = data.motd.raw.map((line: string) => cleanMotdLine(line));
+    }
     
     // Update cache
     cachedData = data;
