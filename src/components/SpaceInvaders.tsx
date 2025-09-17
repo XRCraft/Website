@@ -57,10 +57,20 @@ export default function SpaceInvaders() {
   // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default behavior for game keys to stop page scrolling
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       setKeys(prev => new Set([...prev, e.key]));
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      // Prevent default behavior for game keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
       setKeys(prev => {
         const newKeys = new Set(prev);
         newKeys.delete(e.key);
@@ -68,8 +78,8 @@ export default function SpaceInvaders() {
       });
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
+    window.addEventListener('keyup', handleKeyUp, { passive: false });
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
