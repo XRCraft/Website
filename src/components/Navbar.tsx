@@ -6,6 +6,7 @@ import Image from 'next/image'
 import clsx from 'clsx'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { usePathname } from 'next/navigation'
+import { useTripleClick } from '@/hooks/useSecrets'
 
 // Extracted navigation links
 const NAV_LINKS = [
@@ -20,7 +21,17 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [secretActivated, setSecretActivated] = useState(false)
   const pathname = usePathname()
+
+  // Secret game activation via triple click
+  const activateSecret = () => {
+    setSecretActivated(true)
+    // Dispatch custom event for SecretGameWrapper
+    window.dispatchEvent(new CustomEvent('activateSecretGame'))
+  }
+  
+  const handleTripleClick = useTripleClick(activateSecret)
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -52,22 +63,27 @@ export default function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
-        <Link href="/" className="flex items-center group mc-hover">
-          <div className="relative overflow-hidden rounded-lg pixel-border bg-black p-1">
-            <Image
-              src="/logo.png"
-              alt="XRCraftMC Logo"
-              width={40}
-              height={40}
-              className="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          </div>
-          <span className="text-xl font-bold text-white drop-shadow-md ml-3 hidden sm:inline group-hover:text-mcgold transition-colors pixel-font">
-            XRCraftMC
-          </span>
-        </Link>
+        {/* Logo with secret triple-click */}
+        <div onClick={handleTripleClick} className="cursor-pointer">
+          <Link href="/" className="flex items-center group mc-hover">
+            <div className="relative overflow-hidden rounded-lg pixel-border bg-black p-1">
+              <Image
+                src="/logo.png"
+                alt="XRCraftMC Logo"
+                width={40}
+                height={40}
+                className={clsx(
+                  "h-10 w-auto transition-transform duration-300 group-hover:scale-110",
+                  secretActivated && "animate-pulse"
+                )}
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+            <span className="text-xl font-bold text-white drop-shadow-md ml-3 hidden sm:inline group-hover:text-mcgold transition-colors pixel-font">
+              XRCraftMC
+            </span>
+          </Link>
+        </div>
 
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center space-x-4">

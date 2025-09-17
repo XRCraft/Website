@@ -80,6 +80,28 @@ body::before {
   75% { transform: translate3d(-1px, 1px, 0) scale(1.01); }
 }
 
+/* Enhanced particle animations for more dynamic movement */
+@keyframes particle-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate3d(15px, -10px, 0) scale(1.1) rotate(90deg); }
+  50% { transform: translate3d(-5px, 20px, 0) scale(0.9) rotate(180deg); }
+  75% { transform: translate3d(-20px, -5px, 0) scale(1.05) rotate(270deg); }
+  100% { transform: translate3d(0, 0, 0) scale(1) rotate(360deg); }
+}
+
+@keyframes particle-pulse {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.5); }
+}
+
+@keyframes particle-orbit {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(10px, 10px, 0) rotate(90deg); }
+  50% { transform: translate3d(0, 20px, 0) rotate(180deg); }
+  75% { transform: translate3d(-10px, 10px, 0) rotate(270deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(360deg); }
+}
+
 @keyframes fast-pulse {
   0%, 100% { transform: scale3d(1, 1, 1); }
   50% { transform: scale3d(1.005, 1.005, 1); }
@@ -263,6 +285,8 @@ body::before {
   justify-content: center;
   gap: 0.5rem;
   min-height: 44px; /* Better touch targets */
+  transform: translateZ(0); /* GPU acceleration */
+  backface-visibility: hidden;
 }
 
 .mc-button {
@@ -387,6 +411,33 @@ body::before {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimized button transitions */
+.btn-optimized {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.btn-optimized:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.btn-optimized:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 0.1s;
 }
 
 /* Navigation styles */
