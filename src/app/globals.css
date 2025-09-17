@@ -1,14 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Rubik:wght@400;500;600;700&display=swap&text=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') layer(fonts);
 @import "tailwindcss" layer(base);
 
 /* Optimized base styles - consolidated html/body */
 html {
-  font-family: 'Rubik', sans-serif;
+  font-family: 'Rubik', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   scroll-behavior: smooth;
   font-feature-settings: "liga" 1, "kern" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-display: swap;
+}
+
+/* Font variables for utility classes */
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-rubik: 'Rubik', system-ui, sans-serif;
+  --font-minecraft: 'Press Start 2P', 'Courier New', monospace;
+  --font-minecraft-alt: 'VT323', 'Courier New', monospace;
 }
 
 body {
@@ -29,36 +36,53 @@ body {
   contain: layout style paint;
 }
 
-/* High-performance background animation - optimized blur */
+/* High-performance background animation - reduced blur for better performance */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
   background: 
-    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
-    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.05) 0%, transparent 60%),
+    radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
     url('/bgd.png') center center / cover no-repeat;
-  filter: blur(12px) brightness(0.8);
-  opacity: 0.8;
+  filter: blur(8px) brightness(0.9);
+  opacity: 0.7;
   pointer-events: none;
   will-change: transform;
-  animation: fast-float 15s linear infinite;
+  animation: optimized-float 20s ease-in-out infinite;
   contain: strict;
 }
 
-/* Ultra-fast keyframes - transform-only for 60fps performance */
-@keyframes fast-float {
-  0% { transform: translate3d(-0.2%, -0.2%, 0) rotate(0deg); }
-  25% { transform: translate3d(0.2%, -0.1%, 0) rotate(0.3deg); }
-  50% { transform: translate3d(0.1%, 0.2%, 0) rotate(0deg); }
-  75% { transform: translate3d(-0.1%, 0.1%, 0) rotate(-0.3deg); }
-  100% { transform: translate3d(-0.2%, -0.2%, 0) rotate(0deg); }
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+  
+  .particles {
+    display: none;
+  }
+}
+
+/* Ultra-fast keyframes - minimal transforms for 60fps performance */
+@keyframes optimized-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25% { transform: translate3d(0.1%, -0.05%, 0) rotate(0.1deg); }
+  50% { transform: translate3d(0.05%, 0.1%, 0) rotate(0deg); }
+  75% { transform: translate3d(-0.05%, 0.05%, 0) rotate(-0.1deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  25% { transform: translate3d(-2px, -3px, 0) scale(1.02); }
+  50% { transform: translate3d(2px, -2px, 0) scale(0.98); }
+  75% { transform: translate3d(-1px, 1px, 0) scale(1.01); }
 }
 
 @keyframes fast-pulse {
   0%, 100% { transform: scale3d(1, 1, 1); }
-  50% { transform: scale3d(1.01, 1.01, 1); }
+  50% { transform: scale3d(1.005, 1.005, 1); }
 }
 
 @keyframes obfuscated {
