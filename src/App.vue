@@ -100,9 +100,7 @@ provide('theme', {
 </script>
 
 <style>
-/* Font face definitions */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&family=VT323&family=Rubik:wght@400;500;600;700&display=swap');
-
+/* Font classes */
 .font-inter { font-family: var(--font-inter); }
 .font-minecraft { font-family: var(--font-minecraft); }
 .font-minecraft-alt { font-family: var(--font-minecraft-alt); }

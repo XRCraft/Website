@@ -10,8 +10,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         minecraft: [
-          '"Press Start 2P"',
-          'Minecraftia',
+          'Courier New',
+          'Courier',
           'monospace',
         ],
       },
