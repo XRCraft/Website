@@ -209,17 +209,39 @@ export default function Tetris() {
     }
   }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece]);
 
-  // Rotate current piece
+  // Rotate current piece with wall kicks (SRS-like system)
   const rotate = useCallback(() => {
     if (!currentPiece || gameOver || isPaused) return;
     
     const rotatedShape = rotatePiece(currentPiece.shape);
-    if (isValidPosition(currentPiece, currentPiece.position.x, currentPiece.position.y, rotatedShape)) {
-      setCurrentPiece(prev => prev ? {
-        ...prev,
-        shape: rotatedShape
-      } : null);
+    
+    // Wall kick tests - try different positions
+    const wallKickTests = [
+      { x: 0, y: 0 },   // No kick (original position)
+      { x: -1, y: 0 },  // Kick left
+      { x: 1, y: 0 },   // Kick right
+      { x: 0, y: -1 },  // Kick up
+      { x: -1, y: -1 }, // Kick left and up
+      { x: 1, y: -1 },  // Kick right and up
+      { x: 0, y: 1 },   // Kick down (rare but possible)
+    ];
+    
+    // Try each wall kick position
+    for (const kick of wallKickTests) {
+      const testX = currentPiece.position.x + kick.x;
+      const testY = currentPiece.position.y + kick.y;
+      
+      if (isValidPosition(currentPiece, testX, testY, rotatedShape)) {
+        setCurrentPiece(prev => prev ? {
+          ...prev,
+          position: { x: testX, y: testY },
+          shape: rotatedShape
+        } : null);
+        return; // Successfully rotated and positioned
+      }
     }
+    
+    // If no wall kick worked, rotation is not possible (no action taken)
   }, [currentPiece, gameOver, isPaused, isValidPosition]);
 
   // Handle keyboard input
@@ -228,7 +250,7 @@ export default function Tetris() {
       if (!gameStarted || gameOver) return;
       
       // Prevent default behavior for game keys
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'KeyP'].includes(e.code)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyP', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
         e.preventDefault();
         e.stopPropagation();
       }
