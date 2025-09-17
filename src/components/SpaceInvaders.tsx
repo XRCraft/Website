@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface Position {
   x: number;
@@ -10,6 +10,7 @@ interface Position {
 interface Enemy extends Position {
   id: number;
   destroyed: boolean;
+  type?: 'normal' | 'ufo';
 }
 
 interface Bullet extends Position {
@@ -22,22 +23,79 @@ const GAME_HEIGHT = 600;
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 7;
 const ENEMY_SPEED = 1;
+const ENEMY_DROP_DISTANCE = 40;
 
 export default function SpaceInvaders() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [wave, setWave] = useState(1);
   const [player, setPlayer] = useState<Position>({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
   const [enemies, setEnemies] = useState<Enemy[]>([]);
   const [bullets, setBullets] = useState<Bullet[]>([]);
   const [enemyBullets, setEnemyBullets] = useState<Bullet[]>([]);
   const [keys, setKeys] = useState<Set<string>>(new Set());
+  const [enemyDirection, setEnemyDirection] = useState(1);
+  const [barriers, setBarriers] = useState<Position[]>([]);
+  const [ufo, setUfo] = useState<Enemy | null>(null);
+  const [lastUfoTime, setLastUfoTime] = useState(0);
   
   const gameLoopRef = useRef<number | undefined>(undefined);
   const lastShotRef = useRef(0);
+  const lastEnemyShotRef = useRef(0);
   const bulletIdRef = useRef(0);
 
-  // Initialize enemies
+  // Sound effects using Web Audio API
+  const playSound = useCallback((frequency: number, duration: number, type: OscillatorType = 'square') => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)(); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = type;
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    } catch {
+      // Silently handle audio context errors
+    }
+  }, []);
+
+  const sounds = useMemo(() => ({
+    shoot: () => playSound(800, 0.1),
+    enemyHit: () => playSound(300, 0.2, 'sawtooth'),
+    playerHit: () => {
+      playSound(150, 0.5, 'sawtooth');
+      setTimeout(() => playSound(100, 0.5, 'sawtooth'), 200);
+    },
+    enemyShoot: () => playSound(200, 0.15),
+    ufoHit: () => {
+      playSound(400, 0.3);
+      setTimeout(() => playSound(500, 0.2), 150);
+      setTimeout(() => playSound(600, 0.3), 300);
+    },
+    ufoFly: () => playSound(150, 2.0, 'sine'), // Long continuous sound for UFO
+    waveComplete: () => {
+      playSound(400, 0.2);
+      setTimeout(() => playSound(500, 0.2), 200);
+      setTimeout(() => playSound(600, 0.3), 400);
+    },
+    gameOver: () => {
+      playSound(200, 0.8, 'sawtooth');
+      setTimeout(() => playSound(150, 0.8, 'sawtooth'), 300);
+      setTimeout(() => playSound(100, 1.0, 'sawtooth'), 600);
+    }
+  }), [playSound]);
+
+  // Initialize enemies for new wave
   const initializeEnemies = useCallback(() => {
     const newEnemies: Enemy[] = [];
     let id = 0;
@@ -52,13 +110,33 @@ export default function SpaceInvaders() {
       }
     }
     setEnemies(newEnemies);
+    setEnemyDirection(1);
+  }, []);
+
+  // Initialize barriers (destructible cover)
+  const initializeBarriers = useCallback(() => {
+    const newBarriers: Position[] = [];
+    for (let i = 0; i < 4; i++) {
+      const baseX = 100 + i * 150;
+      const baseY = GAME_HEIGHT - 200;
+      // Create barrier blocks in a rectangular pattern
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 8; col++) {
+          newBarriers.push({
+            x: baseX + col * 8,
+            y: baseY + row * 8
+          });
+        }
+      }
+    }
+    setBarriers(newBarriers);
   }, []);
 
   // Handle keyboard input
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent default behavior for game keys to stop page scrolling
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -67,7 +145,7 @@ export default function SpaceInvaders() {
 
     const handleKeyUp = (e: KeyboardEvent) => {
       // Prevent default behavior for game keys
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -87,7 +165,7 @@ export default function SpaceInvaders() {
     };
   }, []);
 
-  // Game loop
+  // Game loop with enhanced mechanics
   useEffect(() => {
     if (!gameStarted || gameOver) return;
 
@@ -106,14 +184,15 @@ export default function SpaceInvaders() {
         return { ...prev, x: newX };
       });
 
-      // Shoot bullets
-      if ((keys.has(' ') || keys.has('ArrowUp')) && now - lastShotRef.current > 250) {
+      // Handle shooting
+      if ((keys.has(' ') || keys.has('ArrowUp') || keys.has('w')) && now - lastShotRef.current > 200) {
         setBullets(prev => [...prev, {
           id: bulletIdRef.current++,
           x: player.x + 15,
           y: player.y,
           direction: 'up'
         }]);
+        sounds.shoot();
         lastShotRef.current = now;
       }
 
@@ -129,73 +208,198 @@ export default function SpaceInvaders() {
         .filter(bullet => bullet.y < GAME_HEIGHT)
       );
 
-      // Move enemies
-      setEnemies(prev => prev.map(enemy => ({
-        ...enemy,
-        y: enemy.y + ENEMY_SPEED * 0.1
-      })));
-
-      // Enemy shooting (random)
-      if (Math.random() < 0.01) {
-        const aliveEnemies = enemies.filter(e => !e.destroyed);
-        if (aliveEnemies.length > 0) {
-          const randomEnemy = aliveEnemies[Math.floor(Math.random() * aliveEnemies.length)];
-          setEnemyBullets(prev => [...prev, {
-            id: bulletIdRef.current++,
-            x: randomEnemy.x + 15,
-            y: randomEnemy.y + 30,
-            direction: 'down'
-          }]);
-        }
+      // Enemy shooting logic
+      if (now - lastEnemyShotRef.current > 1000) {
+        setEnemies(prevEnemies => {
+          const activeEnemies = prevEnemies.filter(e => !e.destroyed);
+          if (activeEnemies.length > 0) {
+            const randomEnemy = activeEnemies[Math.floor(Math.random() * activeEnemies.length)];
+            setEnemyBullets(prev => [...prev, {
+              id: bulletIdRef.current++,
+              x: randomEnemy.x + 15,
+              y: randomEnemy.y + 20,
+              direction: 'down'
+            }]);
+            sounds.enemyShoot();
+          }
+          return prevEnemies;
+        });
+        lastEnemyShotRef.current = now;
       }
+
+      // UFO logic - appears every 30 seconds
+      if (!ufo && now - lastUfoTime > 30000) {
+        setUfo({
+          id: bulletIdRef.current++,
+          x: -50,
+          y: 30,
+          destroyed: false,
+          type: 'ufo'
+        });
+        setLastUfoTime(now);
+        sounds.ufoFly();
+      }
+
+      // Move UFO
+      if (ufo && !ufo.destroyed) {
+        setUfo(prev => {
+          if (!prev) return null;
+          const newX = prev.x + 2;
+          if (newX > GAME_WIDTH + 50) {
+            return null; // UFO flew off screen
+          }
+          return { ...prev, x: newX };
+        });
+      }
+
+      // Move enemies with authentic arcade movement pattern
+      setEnemies(prev => {
+        const activeEnemies = prev.filter(e => !e.destroyed);
+        if (activeEnemies.length === 0) return prev;
+
+        // Check if any enemy hit the edge
+        const leftMost = Math.min(...activeEnemies.map(e => e.x));
+        const rightMost = Math.max(...activeEnemies.map(e => e.x));
+        
+        let newDirection = enemyDirection;
+        let shouldDrop = false;
+
+        if (enemyDirection > 0 && rightMost >= GAME_WIDTH - 60) {
+          newDirection = -1;
+          shouldDrop = true;
+        } else if (enemyDirection < 0 && leftMost <= 30) {
+          newDirection = 1;
+          shouldDrop = true;
+        }
+
+        if (newDirection !== enemyDirection) {
+          setEnemyDirection(newDirection);
+        }
+
+        return prev.map(enemy => {
+          if (enemy.destroyed) return enemy;
+          
+          const speed = ENEMY_SPEED + Math.floor(wave / 2); // Increase speed with waves
+          
+          if (shouldDrop) {
+            return { ...enemy, y: enemy.y + ENEMY_DROP_DISTANCE };
+          } else {
+            return { ...enemy, x: enemy.x + (enemyDirection * speed) };
+          }
+        });
+      });
 
       // Collision detection - bullets vs enemies
       setBullets(prevBullets => {
-        const remainingBullets = prevBullets.filter(bullet => {
-          const hitEnemy = enemies.find(enemy => 
-            !enemy.destroyed &&
-            bullet.x > enemy.x && bullet.x < enemy.x + 30 &&
-            bullet.y > enemy.y && bullet.y < enemy.y + 30
+        const remainingBullets = [...prevBullets];
+        
+        // Check UFO collision first
+        if (ufo && !ufo.destroyed) {
+          const hitBulletIndex = remainingBullets.findIndex(bullet =>
+            bullet.x >= ufo.x && bullet.x <= ufo.x + 40 &&
+            bullet.y >= ufo.y && bullet.y <= ufo.y + 20
           );
           
-          if (hitEnemy) {
-            setEnemies(prev => prev.map(e => 
-              e.id === hitEnemy.id ? { ...e, destroyed: true } : e
-            ));
-            setScore(prev => prev + 10);
-            return false;
+          if (hitBulletIndex !== -1) {
+            remainingBullets.splice(hitBulletIndex, 1);
+            sounds.ufoHit();
+            setScore(s => s + 300); // UFO gives bonus points
+            setUfo(prev => prev ? { ...prev, destroyed: true } : null);
+            // Remove UFO after short delay
+            setTimeout(() => setUfo(null), 500);
           }
-          return true;
+        }
+        
+        setEnemies(prevEnemies => {
+          return prevEnemies.map(enemy => {
+            if (enemy.destroyed) return enemy;
+            
+            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+              bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
+              bullet.y >= enemy.y && bullet.y <= enemy.y + 20
+            );
+            
+            if (hitBulletIndex !== -1) {
+              remainingBullets.splice(hitBulletIndex, 1);
+              sounds.enemyHit();
+              setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10)); // Different scores for different rows
+              return { ...enemy, destroyed: true };
+            }
+            
+            return enemy;
+          });
         });
+        
         return remainingBullets;
       });
 
       // Collision detection - enemy bullets vs player
       setEnemyBullets(prevBullets => {
-        const hitPlayer = prevBullets.some(bullet =>
-          bullet.x > player.x && bullet.x < player.x + 30 &&
-          bullet.y > player.y && bullet.y < player.y + 30
+        const hitBullet = prevBullets.find(bullet =>
+          bullet.x >= player.x && bullet.x <= player.x + 30 &&
+          bullet.y >= player.y && bullet.y <= player.y + 20
         );
         
-        if (hitPlayer) {
-          setGameOver(true);
+        if (hitBullet) {
+          sounds.playerHit();
+          setLives(l => l - 1);
+          if (lives <= 1) {
+            setGameOver(true);
+            sounds.gameOver();
+          }
+          // Remove the bullet that hit the player
+          return prevBullets.filter(b => b.id !== hitBullet.id);
         }
         
-        return prevBullets.filter(bullet =>
-          !(bullet.x > player.x && bullet.x < player.x + 30 &&
-            bullet.y > player.y && bullet.y < player.y + 30)
-        );
+        return prevBullets;
+      });
+
+      // Collision detection - bullets vs barriers
+      setBullets(prevBullets => {
+        const remainingBullets = [...prevBullets];
+        
+        setBarriers(prevBarriers => {
+          return prevBarriers.filter(barrier => {
+            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+              Math.abs(bullet.x - barrier.x) < 8 && Math.abs(bullet.y - barrier.y) < 8
+            );
+            
+            if (hitBulletIndex !== -1) {
+              remainingBullets.splice(hitBulletIndex, 1);
+              return false; // Remove barrier block
+            }
+            
+            return true;
+          });
+        });
+        
+        return remainingBullets;
       });
 
       // Check win condition
-      if (enemies.every(e => e.destroyed)) {
-        setGameOver(true);
-      }
+      setEnemies(prevEnemies => {
+        const activeEnemies = prevEnemies.filter(e => !e.destroyed);
+        if (activeEnemies.length === 0 && prevEnemies.length > 0) {
+          // Wave complete!
+          sounds.waveComplete();
+          setTimeout(() => {
+            setWave(w => w + 1);
+            initializeEnemies();
+            initializeBarriers();
+          }, 1000);
+        }
+        return prevEnemies;
+      });
 
-      // Check lose condition (enemies too low)
-      if (enemies.some(e => !e.destroyed && e.y > GAME_HEIGHT - 100)) {
-        setGameOver(true);
-      }
+      // Check lose condition - enemies reach bottom
+      setEnemies(prevEnemies => {
+        const anyEnemyAtBottom = prevEnemies.some(e => !e.destroyed && e.y >= GAME_HEIGHT - 100);
+        if (anyEnemyAtBottom) {
+          setGameOver(true);
+          sounds.gameOver();
+        }
+        return prevEnemies;
+      });
 
       gameLoopRef.current = requestAnimationFrame(gameLoop);
     };
@@ -207,16 +411,21 @@ export default function SpaceInvaders() {
         cancelAnimationFrame(gameLoopRef.current);
       }
     };
-  }, [gameStarted, gameOver, keys, player, enemies]);
+  }, [gameStarted, gameOver, keys, player, enemies, enemyDirection, wave, lives, ufo, lastUfoTime, sounds, initializeEnemies, initializeBarriers]);
 
   const startGame = () => {
     setGameStarted(true);
     setGameOver(false);
     setScore(0);
+    setLives(3);
+    setWave(1);
     setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
     setBullets([]);
     setEnemyBullets([]);
+    setUfo(null);
+    setLastUfoTime(0);
     initializeEnemies();
+    initializeBarriers();
   };
 
   const resetGame = () => {
@@ -291,6 +500,21 @@ export default function SpaceInvaders() {
                 />
               ))}
 
+              {/* UFO */}
+              {ufo && !ufo.destroyed && (
+                <div
+                  className="absolute bg-yellow-400"
+                  style={{
+                    left: ufo.x,
+                    top: ufo.y,
+                    width: 40,
+                    height: 20,
+                    clipPath: 'polygon(30% 0%, 70% 0%, 100% 50%, 70% 100%, 30% 100%, 0% 50%)',
+                    boxShadow: '0 0 10px #ffff00'
+                  }}
+                />
+              )}
+
               {/* Player bullets */}
               {bullets.map(bullet => (
                 <div
@@ -309,9 +533,25 @@ export default function SpaceInvaders() {
                 />
               ))}
 
+              {/* Barriers */}
+              {barriers.map((barrier, index) => (
+                <div
+                  key={index}
+                  className="absolute bg-blue-400"
+                  style={{
+                    left: barrier.x,
+                    top: barrier.y,
+                    width: 8,
+                    height: 8
+                  }}
+                />
+              ))}
+
               {/* UI */}
-              <div className="absolute top-4 left-4 text-green-400 font-mono">
-                Score: {score}
+              <div className="absolute top-4 left-4 text-green-400 font-mono space-y-1">
+                <div>Score: {score}</div>
+                <div>Lives: {lives}</div>
+                <div>Wave: {wave}</div>
               </div>
 
               {gameOver && (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
@@ -89,6 +89,46 @@ export default function Tetris() {
   
   const gameLoopRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const dropIntervalRef = useRef(1000);
+  const lockDelayRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+  // Sound effects using Web Audio API
+  const playSound = useCallback((frequency: number, duration: number, type: OscillatorType = 'square') => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)(); // eslint-disable-line @typescript-eslint/no-explicit-any
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = type;
+      
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    } catch {
+      // Silently handle audio context errors
+    }
+  }, []);
+
+  const sounds = useMemo(() => ({
+    move: () => playSound(200, 0.1),
+    rotate: () => playSound(300, 0.15),
+    drop: () => playSound(150, 0.2),
+    lineClear: () => {
+      playSound(400, 0.1);
+      setTimeout(() => playSound(500, 0.1), 100);
+      setTimeout(() => playSound(600, 0.1), 200);
+    },
+    hardDrop: () => playSound(100, 0.3),
+    gameOver: () => {
+      playSound(200, 0.5, 'sawtooth');
+      setTimeout(() => playSound(150, 0.5, 'sawtooth'), 200);
+    }
+  }), [playSound]);
 
   // Generate random piece
   const generatePiece = useCallback((): Piece => {
@@ -178,12 +218,12 @@ export default function Tetris() {
       setLevel(Math.floor((lines + linesCleared) / 10) + 1);
     }
     
-    return filteredBoard;
+    return { board: filteredBoard, linesCleared };
   }, [level, lines]);
 
-  // Move piece
-  const movePiece = useCallback((dx: number, dy: number) => {
-    if (!currentPiece || gameOver || isPaused) return;
+  // Move piece with proper lock delay
+  const movePiece = useCallback((dx: number, dy: number, playMoveSound = true) => {
+    if (!currentPiece || gameOver || isPaused) return false;
     
     const newX = currentPiece.position.x + dx;
     const newY = currentPiece.position.y + dy;
@@ -193,21 +233,55 @@ export default function Tetris() {
         ...prev,
         position: { x: newX, y: newY }
       } : null);
-    } else if (dy > 0) {
-      // Piece hit bottom, place it
-      const newBoard = placePiece(currentPiece);
-      clearLines(newBoard);
       
-      // Check for game over
-      if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
-        setGameOver(true);
-        return;
+      // Play sound for horizontal movement only
+      if (dx !== 0 && playMoveSound) {
+        sounds.move();
       }
       
-      setCurrentPiece(nextPiece);
-      setNextPiece(generatePiece());
+      // Reset lock delay if moving horizontally or when not falling
+      if (dx !== 0 || dy <= 0) {
+        if (lockDelayRef.current) {
+          clearTimeout(lockDelayRef.current);
+          lockDelayRef.current = undefined;
+        }
+      }
+      
+      return true;
+    } else if (dy > 0) {
+      // Piece can't move down - check if at bottom or blocked
+      // Only start lock delay if piece is actually at bottom or can't move
+      if (!lockDelayRef.current) {
+        lockDelayRef.current = setTimeout(() => {
+          if (!currentPiece) return;
+          
+          // Place the piece after lock delay
+          const newBoard = placePiece(currentPiece);
+          const result = clearLines(newBoard);
+          
+          if (result.linesCleared > 0) {
+            sounds.lineClear();
+          } else {
+            sounds.drop();
+          }
+          
+          // Check for game over
+          if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
+            setGameOver(true);
+            sounds.gameOver();
+            return;
+          }
+          
+          setCurrentPiece(nextPiece);
+          setNextPiece(generatePiece());
+          lockDelayRef.current = undefined;
+        }, 500); // 500ms lock delay like modern Tetris
+      }
+      
+      return false;
     }
-  }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece]);
+    return false;
+  }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece, sounds]);
 
   // Rotate current piece with wall kicks (SRS-like system)
   const rotate = useCallback(() => {
@@ -237,13 +311,61 @@ export default function Tetris() {
           position: { x: testX, y: testY },
           shape: rotatedShape
         } : null);
+        
+        sounds.rotate();
+        
+        // Reset lock delay on successful rotation
+        if (lockDelayRef.current) {
+          clearTimeout(lockDelayRef.current);
+          lockDelayRef.current = undefined;
+        }
+        
         return; // Successfully rotated and positioned
       }
     }
     
     // If no wall kick worked, rotation is not possible (no action taken)
-  }, [currentPiece, gameOver, isPaused, isValidPosition]);
+  }, [currentPiece, gameOver, isPaused, isValidPosition, sounds]);
 
+  // Hard drop function
+  const hardDrop = useCallback(() => {
+    if (!currentPiece || gameOver || isPaused) return;
+    
+    let dropY = currentPiece.position.y;
+    while (isValidPosition(currentPiece, currentPiece.position.x, dropY + 1)) {
+      dropY++;
+    }
+    
+    // Clear any existing lock delay
+    if (lockDelayRef.current) {
+      clearTimeout(lockDelayRef.current);
+      lockDelayRef.current = undefined;
+    }
+    
+    // Immediately place the piece at bottom position (no visual drop delay)
+    const droppedPiece = {
+      ...currentPiece,
+      position: { ...currentPiece.position, y: dropY }
+    };
+    
+    const newBoard = placePiece(droppedPiece);
+    const result = clearLines(newBoard);
+    
+    sounds.hardDrop();
+    if (result.linesCleared > 0) {
+      setTimeout(() => sounds.lineClear(), 100);
+    }
+    
+    // Check for game over
+    if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
+      setGameOver(true);
+      sounds.gameOver();
+      return;
+    }
+    
+    setCurrentPiece(nextPiece);
+    setNextPiece(generatePiece());
+  }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece, sounds]);
   // Handle keyboard input
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -266,24 +388,14 @@ export default function Tetris() {
           break;
         case 'ArrowDown':
         case 'KeyS':
-          movePiece(0, 1);
+          movePiece(0, 1, false); // Soft drop, no move sound
           break;
         case 'ArrowUp':
         case 'KeyW':
           rotate();
           break;
         case 'Space':
-          // Hard drop
-          if (!currentPiece) return;
-          let dropY = currentPiece.position.y;
-          while (isValidPosition(currentPiece, currentPiece.position.x, dropY + 1)) {
-            dropY++;
-          }
-          setCurrentPiece(prev => prev ? {
-            ...prev,
-            position: { ...prev.position, y: dropY }
-          } : null);
-          movePiece(0, 1); // This will place the piece
+          hardDrop();
           break;
         case 'KeyP':
           setIsPaused(prev => !prev);
@@ -293,9 +405,9 @@ export default function Tetris() {
 
     window.addEventListener('keydown', handleKeyPress, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameStarted, gameOver, movePiece, rotate, currentPiece, isValidPosition]);
+  }, [gameStarted, gameOver, movePiece, rotate, hardDrop]);
 
-  // Game loop
+  // Game loop - continuous falling
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused) {
       if (gameLoopRef.current) {
@@ -307,7 +419,7 @@ export default function Tetris() {
     dropIntervalRef.current = Math.max(50, 1000 - (level - 1) * 50);
     
     gameLoopRef.current = setInterval(() => {
-      movePiece(0, 1);
+      movePiece(0, 1, false); // Auto-drop, no sound
     }, dropIntervalRef.current);
 
     return () => {
@@ -316,6 +428,15 @@ export default function Tetris() {
       }
     };
   }, [gameStarted, gameOver, isPaused, level, movePiece]);
+
+  // Cleanup lock delay on game state changes
+  useEffect(() => {
+    return () => {
+      if (lockDelayRef.current) {
+        clearTimeout(lockDelayRef.current);
+      }
+    };
+  }, []);
 
   // Start game
   const startGame = () => {
