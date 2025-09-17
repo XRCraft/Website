@@ -13,7 +13,9 @@
 # testing
 /coverage
 
-# next.js
+# build outputs
+/dist
+/build
 /.next/
 /out/
 
@@ -39,3 +41,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Vue/Vite specific
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Backup directories
+src_backup

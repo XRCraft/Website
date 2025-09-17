@@ -1,0 +1,194 @@
+<template>
+  <footer class="mt-12 relative text-white">
+    <!-- Decorative top grass border -->
+    <div class="grass-block-bg rotate-180" aria-hidden="true" />
+    
+    <div class="bg-mcbrown pixel-border pt-12 pb-16 shadow-xl relative z-10">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          <!-- About Section -->
+          <div class="md:pr-6">
+            <div class="flex items-center mb-4">
+              <div class="relative mr-3 pixel-border bg-black p-1 rounded-lg overflow-hidden">
+                <img
+                  src="/logo.png"
+                  alt="XRCraftMC Logo"
+                  class="h-8 w-8"
+                />
+                <div class="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20"></div>
+              </div>
+              <h3 class="text-lg font-semibold pixel-font">XRCraftMC</h3>
+            </div>
+            <p class="text-sm mb-4">
+              A VR optimized Minecraft server available on QuestCraft by default. Experience Minecraft like never before!
+            </p>
+            <div class="flex items-center gap-2 bg-black/20 p-3 rounded-md pixel-border">
+              <span class="text-sm">Server IP:</span>
+              <button
+                @click="handleCopy"
+                :class="[
+                  'relative bg-black/30 px-2 py-1 rounded cursor-pointer border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 mc-button',
+                  { 'ring-2 ring-green-400': copied }
+                ]"
+                title="Click to copy IP"
+                type="button"
+              >
+                <span class="flex items-center gap-1">
+                  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                    <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
+                  </svg>
+                  <code class="font-mono text-base text-blue-600 dark:text-blue-400">{{ serverIp }}</code>
+                </span>
+                <span 
+                  v-if="copied"
+                  class="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-50 whitespace-nowrap animate-pulse"
+                >
+                  Copied!
+                </span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Quick Links -->
+          <nav aria-label="Quick Links">
+            <h3 class="text-lg font-semibold mb-4 pb-1 border-b-2 border-blue-400 pixel-font">Quick Links</h3>
+            <ul class="space-y-2 text-sm">
+              <li v-for="link in FOOTER_LINKS" :key="link.name">
+                <router-link
+                  :to="link.url"
+                  class="flex items-center hover:text-blue-300 transition-transform duration-200 transform hover:translate-x-2"
+                  :aria-label="`Go to ${link.name} page`"
+                >
+                  <span class="w-3 h-3 mr-2 inline-block" aria-hidden="true">
+                    <!-- Arrow icon -->
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-full h-full">
+                      <path d="M9 6L15 12L9 18" />
+                    </svg>
+                  </span>
+                  {{ link.name }}
+                </router-link>
+              </li>
+            </ul>
+          </nav>
+          
+          <!-- Connect With Us -->
+          <section aria-labelledby="social-heading">
+            <h3 id="social-heading" class="text-lg font-semibold mb-4 pb-1 border-b-2 border-blue-400 pixel-font">Connect With Us</h3>
+            <ul class="space-y-3 text-sm">
+              <li v-for="link in SOCIAL_LINKS" :key="link.name">
+                <a
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center w-full px-3 py-2 bg-black/20 hover:bg-black/30 rounded-md pixel-border transition-colors"
+                  :aria-label="`${link.name} - opens in a new tab`"
+                >
+                  <span class="w-6 h-6 mr-2 flex items-center justify-center" aria-hidden="true" v-html="link.icon"></span>
+                  {{ link.name }}
+                </a>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bottom grass border along with rights reserved text -->
+    <div class="grass-block-bg" aria-hidden="true" />
+    <div class="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm text-white rounded-t-lg py-2 px-3 sm:px-4 md:px-6 text-center max-w-[95vw] sm:max-w-[90vw] w-auto shadow-lg border-2 border-white/10 border-b-0">
+      <div class="text-[7px] sm:text-xs">
+        © {{ currentYear }} XRCraftMC. All rights reserved. <br class="sm:hidden" />
+        XRCraft is not affiliated with Mojang Studios or Microsoft.
+      </div>
+    </div>
+  </footer>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+// Footer links
+const FOOTER_LINKS = [
+  { name: 'Home', url: '/' },
+  { name: 'About', url: '/about' },
+  { name: 'Rules', url: '/rules' },
+  { name: 'Servers', url: '/servers' },
+  { name: 'Status', url: '/status' },
+  { name: 'Socials', url: '/socials' }
+]
+
+const SOCIAL_LINKS = [
+  { 
+    name: 'Discord', 
+    url: 'https://discord.xrcraftmc.com',
+    icon: `<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Bluesky_logo_%28black%29.svg/1200px-Bluesky_logo_%28black%29.svg.png">
+        <path d="M19.27 5.33C17.94 4.71 16.5 4.26 15 4a.09.09 0 0 0-.07.03c-.18.33-.39.76-.53 1.09a16.09 16.09 0 0 0-4.8 0c-.14-.34-.35-.76-.54-1.09-.01-.02-.04-.03-.07-.03-1.5.26-2.93.71-4.27 1.33-.01 0-.02.01-.03.02-2.72 4.07-3.47 8.03-3.1 11.95 0 .02.01.04.03.05 1.8 1.32 3.53 2.12 5.24 2.65.03.01.06 0 .07-.02.4-.55.76-1.13 1.07-1.74.02-.04 0-.08-.04-.09-.57-.22-1.11-.48-1.64-.78-.04-.02-.04-.08-.01-.11.11-.08.22-.17.33-.25.02-.02.05-.02.07-.01 3.44 1.57 7.15 1.57 10.55 0 .02-.01.05-.01.07.01.11.09.22.17.33.26.04.03.04.09-.01.11-.52.31-1.07.56-1.64.78-.04.01-.05.06-.04.09.32.61.68 1.19 1.07 1.74.03.02.06.03.09.02 1.72-.53 3.45-1.33 5.25-2.65.02-.01.03-.03.03-.05.44-4.53-.73-8.46-3.1-11.95-.01-.01-.02-.02-.04-.02zM8.52 14.91c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.84 2.12-1.89 2.12zm6.97 0c-1.03 0-1.89-.95-1.89-2.12s.84-2.12 1.89-2.12c1.06 0 1.9.96 1.89 2.12 0 1.17-.83 2.12-1.89 2.12z"/>
+      </svg>`
+  },
+  { 
+    name: 'Bluesky', 
+    url: 'https://bsky.app/profile/xrcraftmc.com',
+    icon: `<svg class="w-5 h-5 fill-current" viewBox="0 0 288 288" xmlns="http://www.w3.org/2000/svg">
+        <path d="M144 0C64.47 0 0 64.47 0 144c0 79.53 64.47 144 144 144s144-64.47 144-144C288 64.47 223.53 0 144 0zm47.16 91c.96 0 1.73.77 1.73 1.73v76.58c-.09 11.67-8.61 21.77-20.26 23.76-1.51.16-3.19.31-4.89.31-17.99 0-32.59-14.61-32.59-32.6 0-17.99 14.6-32.6 32.59-32.6 1.72 0 3.38.15 5.08.45.92.15 1.54 1.02 1.4 1.94-.15.92-1.04 1.56-1.94 1.4a29.738 29.738 0 0 0-4.53-.39c-16.08 0-29.17 13.09-29.17 29.2 0 16.09 13.09 29.19 29.17 29.19 1.6 0 3.13-.14 4.5-.28 9.74-1.69 16.93-10.1 17-19.97V94.61h-38.43c-.96 0-1.74-.78-1.74-1.73 0-.96.78-1.73 1.74-1.73h38.43l.05-.02 1.86-.13zm-86.89 43.05c5.67 0 11.1 1.3 16.15 3.91.87.45 1.21 1.52.76 2.38-.45.86-1.51 1.2-2.38.76a29.764 29.764 0 0 0-14.53-3.58c-16.09 0-29.2 13.09-29.2 29.2 0 16.08 13.11 29.17 29.2 29.17 11.69 0 22.13-6.93 26.74-17.66.32-.74 1.18-1.08 1.91-.76.74.32 1.08 1.17.76 1.91-5.13 11.99-16.97 19.71-29.42 19.71-17.99 0-32.6-14.61-32.6-32.6 0-17.99 14.61-32.59 32.6-32.59l.01.15z"/>
+      </svg>`
+  },
+  { 
+    name: 'GitHub', 
+    url: 'https://github.com/XRCraft',
+    icon: `<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+      </svg>`
+  },
+]
+
+const currentYear = computed(() => new Date().getFullYear())
+const serverIp = 'play.xrcraftmc.com'
+const copied = ref(false)
+
+const handleCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(serverIp)
+    copied.value = true
+    setTimeout(() => copied.value = false, 1500)
+  } catch (error) {
+    console.error('Failed to copy text: ', error)
+    // Fallback for browsers that don't support clipboard API
+    const textArea = document.createElement('textarea')
+    textArea.value = serverIp
+    textArea.style.position = 'fixed'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+    try {
+      document.execCommand('copy')
+      copied.value = true
+      setTimeout(() => copied.value = false, 1500)
+    } catch (err) {
+      console.error('Fallback copy method failed:', err)
+    }
+    document.body.removeChild(textArea)
+  }
+}
+</script>
+
+<style scoped>
+.pixel-border {
+  border: 2px solid #444;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.pixel-font {
+  font-family: var(--font-minecraft);
+}
+
+.grass-block-bg {
+  background: url('/grass.png') repeat-x;
+  height: 40px;
+  background-size: auto 40px;
+}
+
+.mc-button:hover {
+  transform: translateY(-2px);
+}
+</style>
