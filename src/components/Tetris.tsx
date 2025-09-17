@@ -225,7 +225,7 @@ export default function Tetris() {
     return { board: filteredBoard, linesCleared };
   }, [level, lines]);
 
-  // Move piece with proper lock delay
+  // Move piece with proper lock delay - fixed to prevent falling freeze
   const movePiece = useCallback((dx: number, dy: number, playMoveSound = true) => {
     if (!currentPiece || gameOver || isPaused) return false;
     
@@ -243,19 +243,18 @@ export default function Tetris() {
         sounds.move();
       }
       
-      // Reset lock delay if moving horizontally or when not falling
-      if (dx !== 0 || dy <= 0) {
-        if (lockDelayRef.current) {
-          clearTimeout(lockDelayRef.current);
-          lockDelayRef.current = undefined;
-        }
+      // Reset lock delay if moving horizontally - this prevents falling freeze
+      if (dx !== 0 && lockDelayRef.current) {
+        clearTimeout(lockDelayRef.current);
+        lockDelayRef.current = undefined;
+        isLockingRef.current = false;
       }
       
       return true;
     } else if (dy > 0) {
-      // Piece can't move down - check if at bottom or blocked
-      // Only start lock delay if piece is actually at bottom or can't move
-      if (!lockDelayRef.current) {
+      // Piece can't move down - start lock delay if not already started
+      if (!lockDelayRef.current && !isLockingRef.current) {
+        isLockingRef.current = true;
         lockDelayRef.current = setTimeout(() => {
           if (!currentPiece) return;
           
@@ -278,8 +277,10 @@ export default function Tetris() {
           
           setCurrentPiece(nextPiece);
           setNextPiece(generatePiece());
+          setCanHold(true); // Reset hold ability
           lockDelayRef.current = undefined;
-        }, 500); // 500ms lock delay like modern Tetris
+          isLockingRef.current = false;
+        }, 500); // 500ms lock delay
       }
       
       return false;
