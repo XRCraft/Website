@@ -80,6 +80,8 @@ export default function Tetris() {
   );
   const [currentPiece, setCurrentPiece] = useState<Piece | null>(null);
   const [nextPiece, setNextPiece] = useState<Piece | null>(null);
+  const [holdPiece, setHoldPiece] = useState<Piece | null>(null);
+  const [canHold, setCanHold] = useState(true);
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
   const [lines, setLines] = useState(0);
@@ -90,6 +92,8 @@ export default function Tetris() {
   const gameLoopRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const dropIntervalRef = useRef(1000);
   const lockDelayRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const lastMoveTimeRef = useRef(0);
+  const isLockingRef = useRef(false);
 
   // Sound effects using Web Audio API
   const playSound = useCallback((frequency: number, duration: number, type: OscillatorType = 'square') => {
@@ -327,52 +331,86 @@ export default function Tetris() {
     // If no wall kick worked, rotation is not possible (no action taken)
   }, [currentPiece, gameOver, isPaused, isValidPosition, sounds]);
 
-  // Hard drop function
-  const hardDrop = useCallback(() => {
-    if (!currentPiece || gameOver || isPaused) return;
+  // Hold piece function
+  const holdCurrentPiece = useCallback(() => {
+    if (!currentPiece || gameOver || isPaused || !canHold) return;
     
-    let dropY = currentPiece.position.y;
-    while (isValidPosition(currentPiece, currentPiece.position.x, dropY + 1)) {
-      dropY++;
+    if (holdPiece) {
+      // Swap current piece with held piece
+      const tempPiece = { ...holdPiece, position: { x: 4, y: 0 } };
+      setHoldPiece({ ...currentPiece, position: { x: 4, y: 0 } });
+      setCurrentPiece(tempPiece);
+    } else {
+      // First time holding - store current piece and get next piece
+      setHoldPiece({ ...currentPiece, position: { x: 4, y: 0 } });
+      setCurrentPiece(nextPiece);
+      setNextPiece(generatePiece());
     }
     
-    // Clear any existing lock delay
-    if (lockDelayRef.current) {
-      clearTimeout(lockDelayRef.current);
-      lockDelayRef.current = undefined;
+    setCanHold(false); // Can only hold once per piece
+    sounds.move();
+  }, [currentPiece, holdPiece, nextPiece, gameOver, isPaused, canHold, generatePiece, sounds]);
+
+  // Add proper movement timing to fix falling freeze
+  // This function replaces the old game loop to provide smoother falling
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const continuousFall = useCallback(() => {
+    const now = Date.now();
+    
+    // Only fall if enough time has passed and piece isn't in lock delay
+    if (now - lastMoveTimeRef.current >= dropIntervalRef.current && !isLockingRef.current) {
+      const moved = movePiece(0, 1, false);
+      
+      if (!moved) {
+        // Piece can't move down - start lock delay if not already started
+        if (!lockDelayRef.current && !isLockingRef.current) {
+          isLockingRef.current = true;
+          lockDelayRef.current = setTimeout(() => {
+            if (!currentPiece) return;
+            
+            // Place the piece after lock delay
+            const newBoard = placePiece(currentPiece);
+            const result = clearLines(newBoard);
+            
+            if (result.linesCleared > 0) {
+              sounds.lineClear();
+            } else {
+              sounds.drop();
+            }
+            
+            // Check for game over
+            if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
+              setGameOver(true);
+              sounds.gameOver();
+              return;
+            }
+            
+            setCurrentPiece(nextPiece);
+            setNextPiece(generatePiece());
+            setCanHold(true); // Reset hold ability
+            lockDelayRef.current = undefined;
+            isLockingRef.current = false;
+          }, 500); // 500ms lock delay
+        }
+      } else {
+        // Reset lock delay if piece moved successfully
+        if (lockDelayRef.current) {
+          clearTimeout(lockDelayRef.current);
+          lockDelayRef.current = undefined;
+          isLockingRef.current = false;
+        }
+      }
+      
+      lastMoveTimeRef.current = now;
     }
-    
-    // Immediately place the piece at bottom position (no visual drop delay)
-    const droppedPiece = {
-      ...currentPiece,
-      position: { ...currentPiece.position, y: dropY }
-    };
-    
-    const newBoard = placePiece(droppedPiece);
-    const result = clearLines(newBoard);
-    
-    sounds.hardDrop();
-    if (result.linesCleared > 0) {
-      setTimeout(() => sounds.lineClear(), 100);
-    }
-    
-    // Check for game over
-    if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
-      setGameOver(true);
-      sounds.gameOver();
-      return;
-    }
-    
-    setCurrentPiece(nextPiece);
-    setNextPiece(generatePiece());
-  }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece, sounds]);
+  }, [currentPiece, nextPiece, movePiece, placePiece, clearLines, generatePiece, isValidPosition, sounds]);
   // Handle keyboard input
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (!gameStarted || gameOver) return;
       
       // Prevent default behavior for game keys
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyP', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'KeyP', 'KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyC'].includes(e.code)) {
         e.preventDefault();
         e.stopPropagation();
       }
@@ -400,12 +438,15 @@ export default function Tetris() {
         case 'KeyP':
           setIsPaused(prev => !prev);
           break;
+        case 'KeyC':
+          holdCurrentPiece();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyPress, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameStarted, gameOver, movePiece, rotate, hardDrop]);
+  }, [gameStarted, gameOver, movePiece, rotate, holdCurrentPiece]);
 
   // Game loop - continuous falling
   useEffect(() => {
@@ -576,6 +617,42 @@ export default function Tetris() {
             <p className="text-lg">{lines}</p>
           </div>
 
+          {/* Hold Piece */}
+          {gameStarted && (
+            <div className="border-2 border-cyan-400 p-4 bg-gray-900">
+              <h3 className="text-sm mb-2">HOLD</h3>
+              {holdPiece ? (
+                <div 
+                  className="grid gap-px"
+                  style={{
+                    gridTemplateColumns: `repeat(4, 15px)`,
+                    gridTemplateRows: `repeat(4, 15px)`
+                  }}
+                >
+                  {Array(4).fill(null).map((_, y) =>
+                    Array(4).fill(null).map((_, x) => {
+                      const hasBlock = holdPiece.shape[y] && holdPiece.shape[y][x];
+                      return (
+                        <div
+                          key={`hold-${y}-${x}`}
+                          className="border border-gray-700"
+                          style={{
+                            backgroundColor: hasBlock ? holdPiece.color : 'transparent',
+                            width: 15,
+                            height: 15,
+                            opacity: canHold ? 1 : 0.5
+                          }}
+                        />
+                      );
+                    })
+                  )}
+                </div>
+              ) : (
+                <div className="text-xs text-gray-500">Empty</div>
+              )}
+            </div>
+          )}
+
           {/* Next Piece */}
           {nextPiece && (
             <div className="border-2 border-cyan-400 p-4 bg-gray-900">
@@ -615,6 +692,7 @@ export default function Tetris() {
               <p>↓ Soft Drop</p>
               <p>↑ Rotate</p>
               <p>SPACE Hard Drop</p>
+              <p>C Hold</p>
               <p>P Pause</p>
             </div>
           </div>
