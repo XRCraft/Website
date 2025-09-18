@@ -350,6 +350,10 @@ export default function SpaceInvaders() {
         if (playerHitBullet) {
           sounds.playerHit();
           setLives(l => l - 1);
+          
+          // Reset player position and provide brief invincibility
+          setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
+          
           if (lives <= 1) {
             setGameOver(true);
             sounds.gameOver();
@@ -358,11 +362,11 @@ export default function SpaceInvaders() {
           remainingBullets = remainingBullets.filter(b => b.id !== playerHitBullet.id);
         }
         
-        // Check collision with barriers
+        // Check collision with barriers - enemy bullets destroy barriers
         setBarriers(prevBarriers => {
           return prevBarriers.filter(barrier => {
             const hitBulletIndex = remainingBullets.findIndex(bullet =>
-              Math.abs(bullet.x - barrier.x) < 8 && Math.abs(bullet.y - barrier.y) < 8
+              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
             );
             
             if (hitBulletIndex !== -1) {
@@ -377,14 +381,14 @@ export default function SpaceInvaders() {
         return remainingBullets;
       });
 
-      // Collision detection - bullets vs barriers
+      // Collision detection - player bullets vs barriers
       setBullets(prevBullets => {
-        const remainingBullets = [...prevBullets];
+        let remainingBullets = [...prevBullets];
         
         setBarriers(prevBarriers => {
           return prevBarriers.filter(barrier => {
             const hitBulletIndex = remainingBullets.findIndex(bullet =>
-              Math.abs(bullet.x - barrier.x) < 8 && Math.abs(bullet.y - barrier.y) < 8
+              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
             );
             
             if (hitBulletIndex !== -1) {
