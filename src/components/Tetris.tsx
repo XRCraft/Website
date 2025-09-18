@@ -352,6 +352,49 @@ export default function Tetris() {
     sounds.move();
   }, [currentPiece, holdPiece, nextPiece, gameOver, isPaused, canHold, generatePiece, sounds]);
 
+  // Hard drop function
+  const hardDrop = useCallback(() => {
+    if (!currentPiece || gameOver || isPaused) return;
+
+    let dropY = currentPiece.position.y;
+    while (isValidPosition(currentPiece, currentPiece.position.x, dropY + 1)) {
+      dropY++;
+    }
+
+    const droppedPiece = {
+      ...currentPiece,
+      position: { x: currentPiece.position.x, y: dropY }
+    };
+
+    // Place the piece immediately
+    const newBoard = placePiece(droppedPiece);
+    const result = clearLines(newBoard);
+
+    if (result.linesCleared > 0) {
+      sounds.lineClear();
+    } else {
+      sounds.hardDrop();
+    }
+
+    // Check for game over
+    if (nextPiece && !isValidPosition(nextPiece, nextPiece.position.x, nextPiece.position.y)) {
+      setGameOver(true);
+      sounds.gameOver();
+      return;
+    }
+
+    setCurrentPiece(nextPiece);
+    setNextPiece(generatePiece());
+    setCanHold(true);
+
+    // Clear any existing lock delay
+    if (lockDelayRef.current) {
+      clearTimeout(lockDelayRef.current);
+      lockDelayRef.current = undefined;
+      isLockingRef.current = false;
+    }
+  }, [currentPiece, gameOver, isPaused, isValidPosition, placePiece, clearLines, nextPiece, generatePiece, sounds]);
+
   // Add proper movement timing to fix falling freeze
   // This function replaces the old game loop to provide smoother falling
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -447,7 +490,7 @@ export default function Tetris() {
 
     window.addEventListener('keydown', handleKeyPress, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [gameStarted, gameOver, movePiece, rotate, holdCurrentPiece]);
+  }, [gameStarted, gameOver, movePiece, rotate, hardDrop, holdCurrentPiece]);
 
   // Game loop - continuous falling
   useEffect(() => {
