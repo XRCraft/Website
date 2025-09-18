@@ -1,11 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
-    ignoreDuringBuilds: true,
-  },
+  // Remove ESLint ignore since we've fixed all issues
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
   
   // Performance optimizations
   poweredByHeader: false,
@@ -15,6 +14,7 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     remotePatterns: [
       {
         protocol: 'https',
@@ -22,6 +22,44 @@ const nextConfig: NextConfig = {
         pathname: '/avatar/**',
       },
     ],
+  },
+  
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['@heroicons/react'],
+  },
+  
+  // External packages optimization
+  serverExternalPackages: [],
+  
+  // Compression and caching
+  compress: true,
+  
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
   },
   
   // Cache optimization

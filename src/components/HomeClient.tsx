@@ -91,9 +91,9 @@ export default function HomeClient() {
                 <Image 
                   src="/XRCL.png" 
                   alt="XRCraft Logo" 
-                  width={300} 
-                  height={80} 
-                  className="h-auto w-auto max-w-xs" 
+                  width={250} 
+                  height={65} 
+                  className="h-auto w-auto max-w-sm" 
                   priority
                 />
               </div>
@@ -119,16 +119,16 @@ export default function HomeClient() {
                   </div>
                   <button
                     onClick={handleHeroCopy}
-                    className={`relative bg-black/30 px-2 py-1 rounded cursor-pointer border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 ${heroCopied ? 'ring-2 ring-green-400' : ''}`}
+                    className={`relative glass-btn px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${heroCopied ? 'ring-2 ring-green-400' : ''}`}
                     title="Click to copy server IP"
                     aria-label="Copy server IP to clipboard"
                   >
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-2">
                       <svg className="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                         <rect x="9" y="9" width="13" height="13" rx="2"/>
                         <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
                       </svg>
-                      <code className="font-mono text-blue-200">{serverIp}</code>
+                      <code className="font-mono text-sm text-blue-200">{serverIp}</code>
                     </span>
                     {heroCopied && (
                       <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg z-10 whitespace-nowrap animate-pulse" role="status">
@@ -182,17 +182,17 @@ export default function HomeClient() {
               <p className="text-sm font-semibold mr-2 text-white">Server IP:</p>
               <button
                 onClick={handleInfoCopy}
-                className={`relative bg-black/30 px-2 py-1 rounded cursor-pointer border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200 shadow-sm hover:bg-black/50 active:scale-95 mc-button ${infoCopied ? 'ring-2 ring-green-400' : ''}`}
+                className={`relative glass-btn px-3 py-2 rounded-lg cursor-pointer transition-all duration-200 ${infoCopied ? 'ring-2 ring-green-400' : ''}`}
                 title="Click to copy server IP"
                 type="button"
                 aria-label="Copy server IP to clipboard"
               >
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
                     <rect x="9" y="9" width="13" height="13" rx="2"/>
                     <path d="M5 15V5a2 2 0 0 1 2-2h10"/>
                   </svg>
-                  <code className="font-mono text-base text-blue-200">{serverIp}</code>
+                  <code className="font-mono text-sm text-blue-200">{serverIp}</code>
                 </span>
                 {infoCopied && (
                   <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 px-3 py-1 bg-green-500 text-white text-xs rounded shadow-lg animate-pulse z-10 whitespace-nowrap" role="status">

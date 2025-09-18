@@ -102,7 +102,7 @@ export default function NotFound() {
               You have fallen into the void!
             </h2>
             <p className="text-lg text-gray-400">
-              The page you're looking for doesn't exist on this server.
+              The page you&apos;re looking for doesn&apos;t exist on this server.
             </p>
           </div>
 
