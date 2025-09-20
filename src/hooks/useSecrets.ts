@@ -51,29 +51,3 @@ export function useTetrisCode(callback: () => void) {
 
   return sequence;
 }
-
-// Alternative secret: Triple-click on logo
-export function useTripleClick(callback: () => void) {
-  const [clickCount, setClickCount] = useState(0);
-  const [lastClickTime, setLastClickTime] = useState(0);
-
-  const handleClick = () => {
-    const now = Date.now();
-    
-    if (now - lastClickTime < 500) {
-      const newCount = clickCount + 1;
-      setClickCount(newCount);
-      
-      if (newCount >= 3) {
-        callback();
-        setClickCount(0);
-      }
-    } else {
-      setClickCount(1);
-    }
-    
-    setLastClickTime(now);
-  };
-
-  return handleClick;
-}

@@ -192,7 +192,7 @@ export default function SpaceInvaders() {
             id: bulletIdRef.current++,
             x: player.x + 15,
             y: player.y,
-            direction: 'up'
+            direction: "up" as "up"
           }];
           sounds.shoot();
           lastShotRef.current = now;
