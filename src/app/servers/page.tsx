@@ -56,6 +56,15 @@ export default function ServersPage() {
       difficulty: "Easy",
       players: "200"
     },
+    { 
+      name: "Minigames", 
+      description: "Collection of many fun mini-games to play with friends and have fun!",
+      icon: "🎮",
+      color: "from-mcpurple to-mcpink",
+      difficulty: "Easy",
+      players: "32",
+      comingSoon: true
+    },
   ];
 
   const serversLater = [
@@ -66,15 +75,6 @@ export default function ServersPage() {
       color: "from-mcgold to-mcdiamond",
       difficulty: "Medium",
       players: "100",
-      comingSoon: true
-    },
-        { 
-      name: "Minigames", 
-      description: "Collection of many fun mini-games to play with friends and have fun!",
-      icon: "🎮",
-      color: "from-mcpurple to-mcpink",
-      difficulty: "Easy",
-      players: "32",
       comingSoon: true
     },
   ];
