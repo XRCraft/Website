@@ -6,7 +6,6 @@ import Image from 'next/image'
 import clsx from 'clsx'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { usePathname } from 'next/navigation'
-import { useTripleClick } from '@/hooks/useSecrets'
 
 // Extracted navigation links
 const NAV_LINKS = [
@@ -21,17 +20,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [secretActivated, setSecretActivated] = useState(false)
   const pathname = usePathname()
-
-  // Secret game activation via triple click
-  const activateSecret = () => {
-    setSecretActivated(true)
-    // Dispatch custom event for SecretGameWrapper
-    window.dispatchEvent(new CustomEvent('activateSecretGame'))
-  }
-  
-  const handleTripleClick = useTripleClick(activateSecret)
 
   // Close mobile menu when route changes
   useEffect(() => {
@@ -64,7 +53,7 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo with secret triple-click */}
-        <div onClick={handleTripleClick} className="cursor-pointer">
+        <div className="cursor-pointer">
           <Link href="/" className="flex items-center group mc-hover">
             <div className="relative overflow-hidden rounded-lg pixel-border bg-black p-1">
               <Image
@@ -74,7 +63,6 @@ export default function Navbar() {
                 height={40}
                 className={clsx(
                   "h-10 w-auto transition-transform duration-300 group-hover:scale-110",
-                  secretActivated && "animate-pulse"
                 )}
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
