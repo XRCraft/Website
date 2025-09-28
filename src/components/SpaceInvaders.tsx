@@ -293,19 +293,20 @@ export default function SpaceInvaders() {
         });
       });
 
-      // Collision detection - bullets vs enemies
+      // Collision detection - bullets vs enemies, UFO, and barriers
       setBullets(prevBullets => {
-        const remainingBullets = [...prevBullets];
+        let remainingBullets = [...prevBullets];
+        const bulletsToRemove: number[] = [];
         
         // Check UFO collision first
         if (ufo && !ufo.destroyed) {
-          const hitBulletIndex = remainingBullets.findIndex(bullet =>
+          const hitBullet = remainingBullets.find(bullet =>
             bullet.x >= ufo.x && bullet.x <= ufo.x + 40 &&
             bullet.y >= ufo.y && bullet.y <= ufo.y + 20
           );
           
-          if (hitBulletIndex !== -1) {
-            remainingBullets.splice(hitBulletIndex, 1);
+          if (hitBullet) {
+            bulletsToRemove.push(hitBullet.id);
             sounds.ufoHit();
             setScore(s => s + 300); // UFO gives bonus points
             setUfo(prev => prev ? { ...prev, destroyed: true } : null);
@@ -314,17 +315,19 @@ export default function SpaceInvaders() {
           }
         }
         
+        // Check enemy collisions
         setEnemies(prevEnemies => {
           return prevEnemies.map(enemy => {
             if (enemy.destroyed) return enemy;
             
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+            const hitBullet = remainingBullets.find(bullet =>
+              !bulletsToRemove.includes(bullet.id) &&
               bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
               bullet.y >= enemy.y && bullet.y <= enemy.y + 20
             );
             
-            if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1);
+            if (hitBullet) {
+              bulletsToRemove.push(hitBullet.id);
               sounds.enemyHit();
               setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10)); // Different scores for different rows
               return { ...enemy, destroyed: true };
@@ -334,12 +337,31 @@ export default function SpaceInvaders() {
           });
         });
         
-        return remainingBullets;
+        // Check barrier collisions
+        setBarriers(prevBarriers => {
+          return prevBarriers.filter(barrier => {
+            const hitBullet = remainingBullets.find(bullet =>
+              !bulletsToRemove.includes(bullet.id) &&
+              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
+            );
+            
+            if (hitBullet) {
+              bulletsToRemove.push(hitBullet.id);
+              return false; // Remove barrier block
+            }
+            
+            return true;
+          });
+        });
+        
+        // Remove all bullets that hit something
+        return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
       });
 
       // Collision detection - enemy bullets vs player and barriers
       setEnemyBullets(prevBullets => {
         let remainingBullets = [...prevBullets];
+        const bulletsToRemove: number[] = [];
         
         // Check collision with player
         const playerHitBullet = remainingBullets.find(bullet =>
@@ -348,6 +370,7 @@ export default function SpaceInvaders() {
         );
         
         if (playerHitBullet) {
+          bulletsToRemove.push(playerHitBullet.id);
           sounds.playerHit();
           setLives(l => l - 1);
           
@@ -358,19 +381,18 @@ export default function SpaceInvaders() {
             setGameOver(true);
             sounds.gameOver();
           }
-          // Remove the bullet that hit the player
-          remainingBullets = remainingBullets.filter(b => b.id !== playerHitBullet.id);
         }
         
         // Check collision with barriers - enemy bullets destroy barriers
         setBarriers(prevBarriers => {
           return prevBarriers.filter(barrier => {
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+            const hitBullet = remainingBullets.find(bullet =>
+              !bulletsToRemove.includes(bullet.id) &&
               Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
             );
             
-            if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1);
+            if (hitBullet) {
+              bulletsToRemove.push(hitBullet.id);
               return false; // Remove barrier block
             }
             
@@ -378,29 +400,8 @@ export default function SpaceInvaders() {
           });
         });
         
-        return remainingBullets;
-      });
-
-      // Collision detection - player bullets vs barriers
-      setBullets(prevBullets => {
-        let remainingBullets = [...prevBullets];
-        
-        setBarriers(prevBarriers => {
-          return prevBarriers.filter(barrier => {
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
-              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
-            );
-            
-            if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1);
-              return false; // Remove barrier block
-            }
-            
-            return true;
-          });
-        });
-        
-        return remainingBullets;
+        // Remove all bullets that hit something
+        return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
       });
 
       // Check win condition
