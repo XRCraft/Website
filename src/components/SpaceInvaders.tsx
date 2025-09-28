@@ -293,116 +293,121 @@ export default function SpaceInvaders() {
         });
       });
 
-      // Collision detection - bullets vs enemies, UFO, and barriers
-      setBullets(prevBullets => {
-        let remainingBullets = [...prevBullets];
-        const bulletsToRemove: number[] = [];
-        
-        // Check UFO collision first
-        if (ufo && !ufo.destroyed) {
-          const hitBullet = remainingBullets.find(bullet =>
-            bullet.x >= ufo.x && bullet.x <= ufo.x + 40 &&
-            bullet.y >= ufo.y && bullet.y <= ufo.y + 20
-          );
+      // Collision detection - player bullets vs enemies, UFO, and barriers
+      const handlePlayerBulletCollisions = () => {
+        setBullets(prevBullets => {
+          const bulletsToRemove: number[] = [];
+          const remainingBullets = [...prevBullets];
           
-          if (hitBullet) {
-            bulletsToRemove.push(hitBullet.id);
-            sounds.ufoHit();
-            setScore(s => s + 300); // UFO gives bonus points
-            setUfo(prev => prev ? { ...prev, destroyed: true } : null);
-            // Remove UFO after short delay
-            setTimeout(() => setUfo(null), 500);
+          // Check UFO collision first
+          if (ufo && !ufo.destroyed) {
+            const hitBullet = remainingBullets.find(bullet =>
+              bullet.x >= ufo.x && bullet.x <= ufo.x + 40 &&
+              bullet.y >= ufo.y && bullet.y <= ufo.y + 20
+            );
+            
+            if (hitBullet) {
+              bulletsToRemove.push(hitBullet.id);
+              sounds.ufoHit();
+              setScore(s => s + 300);
+              setUfo(prev => prev ? { ...prev, destroyed: true } : null);
+              setTimeout(() => setUfo(null), 500);
+            }
           }
-        }
-        
-        // Check enemy collisions
-        setEnemies(prevEnemies => {
-          return prevEnemies.map(enemy => {
-            if (enemy.destroyed) return enemy;
-            
-            const hitBullet = remainingBullets.find(bullet =>
-              !bulletsToRemove.includes(bullet.id) &&
-              bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
-              bullet.y >= enemy.y && bullet.y <= enemy.y + 20
-            );
-            
-            if (hitBullet) {
-              bulletsToRemove.push(hitBullet.id);
-              sounds.enemyHit();
-              setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10)); // Different scores for different rows
-              return { ...enemy, destroyed: true };
-            }
-            
-            return enemy;
+          
+          // Check enemy collisions
+          setEnemies(prevEnemies => {
+            return prevEnemies.map(enemy => {
+              if (enemy.destroyed) return enemy;
+              
+              const hitBullet = remainingBullets.find(bullet =>
+                !bulletsToRemove.includes(bullet.id) &&
+                bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
+                bullet.y >= enemy.y && bullet.y <= enemy.y + 20
+              );
+              
+              if (hitBullet) {
+                bulletsToRemove.push(hitBullet.id);
+                sounds.enemyHit();
+                setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10));
+                return { ...enemy, destroyed: true };
+              }
+              
+              return enemy;
+            });
           });
-        });
-        
-        // Check barrier collisions
-        setBarriers(prevBarriers => {
-          return prevBarriers.filter(barrier => {
-            const hitBullet = remainingBullets.find(bullet =>
-              !bulletsToRemove.includes(bullet.id) &&
-              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
-            );
-            
-            if (hitBullet) {
-              bulletsToRemove.push(hitBullet.id);
-              return false; // Remove barrier block
-            }
-            
-            return true;
+          
+          // Check barrier collisions
+          setBarriers(prevBarriers => {
+            return prevBarriers.filter(barrier => {
+              const hitBullet = remainingBullets.find(bullet =>
+                !bulletsToRemove.includes(bullet.id) &&
+                Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
+              );
+              
+              if (hitBullet) {
+                bulletsToRemove.push(hitBullet.id);
+                return false;
+              }
+              
+              return true;
+            });
           });
+          
+          // Return bullets with collided ones removed
+          return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
         });
-        
-        // Remove all bullets that hit something
-        return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
-      });
+      };
+
+      handlePlayerBulletCollisions();
 
       // Collision detection - enemy bullets vs player and barriers
-      setEnemyBullets(prevBullets => {
-        let remainingBullets = [...prevBullets];
-        const bulletsToRemove: number[] = [];
-        
-        // Check collision with player
-        const playerHitBullet = remainingBullets.find(bullet =>
-          bullet.x >= player.x && bullet.x <= player.x + 30 &&
-          bullet.y >= player.y && bullet.y <= player.y + 20
-        );
-        
-        if (playerHitBullet) {
-          bulletsToRemove.push(playerHitBullet.id);
-          sounds.playerHit();
-          setLives(l => l - 1);
+      const handleEnemyBulletCollisions = () => {
+        setEnemyBullets(prevBullets => {
+          const bulletsToRemove: number[] = [];
+          const remainingBullets = [...prevBullets];
           
-          // Reset player position and provide brief invincibility
-          setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
+          // Check collision with player
+          const playerHitBullet = remainingBullets.find(bullet =>
+            bullet.x >= player.x && bullet.x <= player.x + 30 &&
+            bullet.y >= player.y && bullet.y <= player.y + 20
+          );
           
-          if (lives <= 1) {
-            setGameOver(true);
-            sounds.gameOver();
-          }
-        }
-        
-        // Check collision with barriers - enemy bullets destroy barriers
-        setBarriers(prevBarriers => {
-          return prevBarriers.filter(barrier => {
-            const hitBullet = remainingBullets.find(bullet =>
-              !bulletsToRemove.includes(bullet.id) &&
-              Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
-            );
+          if (playerHitBullet) {
+            bulletsToRemove.push(playerHitBullet.id);
+            sounds.playerHit();
+            setLives(l => l - 1);
+            setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
             
-            if (hitBullet) {
-              bulletsToRemove.push(hitBullet.id);
-              return false; // Remove barrier block
+            if (lives <= 1) {
+              setGameOver(true);
+              sounds.gameOver();
             }
-            
-            return true;
+          }
+          
+          // Check collision with barriers
+          setBarriers(prevBarriers => {
+            return prevBarriers.filter(barrier => {
+              const hitBullet = remainingBullets.find(bullet =>
+                !bulletsToRemove.includes(bullet.id) &&
+                Math.abs(bullet.x - barrier.x) < 10 && Math.abs(bullet.y - barrier.y) < 10
+              );
+              
+              if (hitBullet) {
+                bulletsToRemove.push(hitBullet.id);
+                return false;
+              }
+              
+              return true;
+            });
           });
+          
+          // Return bullets with collided ones removed
+          return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
         });
-        
-        // Remove all bullets that hit something
-        return remainingBullets.filter(bullet => !bulletsToRemove.includes(bullet.id));
-      });
+      };
+
+      handleEnemyBulletCollisions();
 
       // Check win condition
       setEnemies(prevEnemies => {
