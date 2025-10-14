@@ -1,24 +1,13 @@
-import { Inter, Press_Start_2P, VT323, Rubik } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./providers";
 import dynamic from 'next/dynamic';
 import { Metadata, Viewport } from 'next';
 import Navbar from "@/components/Navbar";
+import ClientSecretGame from "@/components/ClientSecretGame";
 
 // Dynamically import components that aren't needed for initial page render
 const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
 const AnimatedLayout = dynamic(() => import('@/components/AnimatedLayout'), { ssr: true });
-
-// Fonts
-const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
-const pressStart2P = Press_Start_2P({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-minecraft" });
-const vt323 = VT323({ weight: "400", subsets: ["latin"], display: "swap", variable: "--font-minecraft-alt" });
-const rubik = Rubik({ 
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-rubik",
-  weight: ["400", "500", "600", "700"],
-});
 
 // Viewport configuration
 export const viewport: Viewport = {
@@ -83,11 +72,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`scroll-smooth ${inter.variable} ${pressStart2P.variable} ${vt323.variable} ${rubik.variable}`}>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
+        {/* Optimized web fonts with async loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&family=Press+Start+2P&family=VT323&display=swap" 
+          rel="stylesheet" 
+        />
       </head>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider
@@ -96,21 +92,28 @@ export default function RootLayout({
           enableSystem
           enableColorScheme={false}
         >
-          {/* Minecraft particles effect (optional decorative element) */}
+          {/* Enhanced Minecraft particles effect with dynamic movement */}
           <div className="particles" aria-hidden="true">
-            {Array.from({ length: 15 }).map((_, i) => (
-              <div
-                key={i}
-                className="absolute bg-white rounded-full w-1 h-1 opacity-30"
-                style={{
-                  top: `${(Math.sin(i * 0.5) * 0.5 + 0.5) * 100}%`,
-                  left: `${(Math.cos(i * 0.7) * 0.5 + 0.5) * 100}%`,
-                  animation: `float ${10 + i % 8 * 2.5}s linear infinite`,
-                  animationDelay: `${i * 0.7}s`,
-                  willChange: 'transform'
-                }}
-              />
-            ))}
+            {Array.from({ length: 12 }).map((_, i) => {
+              const animationType = ['particle-drift', 'particle-pulse', 'particle-orbit'][i % 3];
+              const size = [1, 1.5, 2][i % 3];
+              return (
+                <div
+                  key={i}
+                  className="absolute bg-white rounded-full opacity-20"
+                  style={{
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    top: `${(Math.sin(i * 0.8) * 0.4 + 0.5) * 100}%`,
+                    left: `${(Math.cos(i * 0.9) * 0.4 + 0.5) * 100}%`,
+                    animation: `${animationType} ${8 + i % 6 * 2}s ease-in-out infinite`,
+                    animationDelay: `${i * 0.8}s`,
+                    willChange: 'transform, opacity',
+                    filter: i % 4 === 0 ? 'blur(0.5px)' : 'none'
+                  }}
+                />
+              );
+            })}
           </div>
           
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white">
@@ -122,6 +125,7 @@ export default function RootLayout({
           </main>
           <Footer />
         </ThemeProvider>
+        <ClientSecretGame />
       </body>
     </html>
   );

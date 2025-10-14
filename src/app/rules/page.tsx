@@ -5,9 +5,10 @@ export const metadata: Metadata = {
   description: 'Read the rules for playing on the XRCraftMC Minecraft Server.',
 };
 export default function RulesPage() {
-  const discordrules = [
-    // todo
-  ]
+  // TODO: Add Discord rules when needed
+  // const discordrules = [
+  //   // todo
+  // ]
   const rules = [
     { id: 1, text: "No spamming of any type. This means no obnoxious noises, texts, or soundboards through ingame voicechat." },
     { id: 2, text: "No Advertisement. Any link, IP, or anything that may advertise another server, service, or anything will be heavily moderated." },

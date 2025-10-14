@@ -1,13 +1,18 @@
 {
-  "name": "xrcraftmc-nextjs-app",
-  "version": "0.1.0",
+  "name": "xrcraftmc-website",
+  "version": "1.0.0",
+  "description": "A modern, performance-optimized website for the XRCraft VR Minecraft server",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "preview": "npm run build && npm run start"
   },
+  "keywords": ["minecraft", "vr", "questcraft", "xrcraft", "gaming", "next.js"],
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1",
@@ -28,5 +33,9 @@
     "eslint-config-next": "15.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }

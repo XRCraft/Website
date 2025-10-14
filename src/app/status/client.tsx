@@ -50,17 +50,6 @@ const fetcher = async (url: string) => {
   }
 };
 
-// Function to create a clean string representation from MOTD with color codes stripped
-function cleanMotdText(text: string): string {
-  if (!text) return '';
-  
-  // Remove all Minecraft formatting codes
-  return text
-    .replace(/§[0-9a-fklmnor]/gi, '') // Standard codes (colors and formatting)
-    .replace(/§#[0-9A-F]{6}/gi, '') // Hex codes
-    .trim();
-}
-
 // Function to parse Minecraft color codes in the format used by XRCraftMC
 function parseMinecraftColors(text: string) {
   if (!text) return "";
@@ -207,23 +196,28 @@ export default function ServerStatusClient() {
   const [copiedHeader, setCopiedHeader] = useState(false);
   const [copiedJoin, setCopiedJoin] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [isOnline, setIsOnline] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(new Date);
   
-  // Monitor network connectivity
-  useEffect(() => {
-    setIsOnline(navigator.onLine);
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+  // TODO: Add network connectivity monitoring
+  // const [isOnline] = useState(navigator?.onLine ?? true);
+  
+  // TODO: Implement network connectivity monitoring
+  // useEffect(() => {
+  //   const handleOnline = () => {
+  //     // TODO: Refresh data when connection is restored
+  //   };
+  //   const handleOffline = () => {
+  //     // TODO: Show offline indicator
+  //   };
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
+  //   window.addEventListener('online', handleOnline);
+  //   window.addEventListener('offline', handleOffline);
+    
+  //   return () => {
+  //     window.removeEventListener('online', handleOnline);
+  //     window.removeEventListener('offline', handleOffline);
+  //   };
+  // }, []);
   const { data, error, isLoading, mutate } = useSWR(
     `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
     fetcher, 

@@ -76,7 +76,7 @@ export function useScrollFadeIn() {
         elements.forEach(el => observer.unobserve(el));
       }
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, elements]);
 }
 
 /**

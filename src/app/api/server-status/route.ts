@@ -29,7 +29,7 @@ interface ServerStatusData {
   map?: string;
   plugins?: string[];
   mods?: string[];
-  [key: string]: any; // Allow for other properties
+  [key: string]: unknown; // Allow for other properties
 }
 
 // Set a 2-minute cache in memory for better performance
@@ -37,7 +37,8 @@ const CACHE_TIME = 120 * 1000; // 2 minutes in milliseconds
 let cachedData: ServerStatusData | null = null;
 let lastFetch = 0;
 let lastIp = '';
-let requestsInProgress: Map<string, Promise<Response>> = new Map();
+// TODO: Implement request deduplication
+// const requestsInProgress: Map<string, Promise<Response>> = new Map();
 
 /**
  * Cleans Minecraft formatting codes from MOTD text
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
         if (process.env.NODE_ENV !== 'production') {
           console.error('Error response body:', errorBody);
         }
-      } catch (readError) {
+      } catch {
         // Ignore read errors
       }
       

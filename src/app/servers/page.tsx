@@ -153,7 +153,7 @@ export default function ServersPage() {
           <h2 className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-4">
             🔮 Coming Soon
           </h2>
-          <p className="text-lg text-gray-800 dark:text-gray-400">Exciting new game modes we're working on!</p>
+          <p className="text-lg text-gray-800 dark:text-gray-400">Exciting new game modes we&apos;re working on!</p>
         </div>
         
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8 p-4">
