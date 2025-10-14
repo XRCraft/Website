@@ -10,8 +10,12 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        sans: ['var(--font-inter)', 'sans-serif'],
+        rubik: ['var(--font-rubik)', 'sans-serif'],
+        'press-start': ['var(--font-press-start-2p)', 'cursive'],
+        vt323: ['var(--font-vt323)', 'monospace'],
         minecraft: [
-          '"Press Start 2P"',
+          'var(--font-press-start-2p)',
           'Minecraftia',
           'monospace',
         ],

@@ -188,12 +188,13 @@ export default function SpaceInvaders() {
       if ((keys.has(' ') || keys.has('ArrowUp') || keys.has('w')) && now - lastShotRef.current > 200) {
         setBullets(prev => {
           if (prev.length >= 3) return prev; // Limit to 3 bullets on screen
-          const newBullets = [...prev, {
+          const newBullet: Bullet = {
             id: bulletIdRef.current++,
             x: player.x + 15,
             y: player.y,
-            direction: "up" as "up"
-          }];
+            direction: "up"
+          };
+          const newBullets = [...prev, newBullet];
           sounds.shoot();
           lastShotRef.current = now;
           return newBullets;
@@ -295,13 +296,11 @@ export default function SpaceInvaders() {
 
       // Collision detection - consolidated approach
       setBullets(prevBullets => {
-        let remainingBullets = [...prevBullets];
-        
-        // Check UFO collision
-        if (ufo && !ufo.destroyed) {
-          remainingBullets = remainingBullets.filter(bullet => {
+        const remainingBullets = [...prevBullets].filter(bullet => {
+          // Check UFO collision
+          if (ufo && !ufo.destroyed) {
             const hit = bullet.x >= ufo.x && bullet.x <= ufo.x + 40 &&
-                       bullet.y >= ufo.y && bullet.y <= ufo.y + 20;
+                        bullet.y >= ufo.y && bullet.y <= ufo.y + 20;
             if (hit) {
               sounds.ufoHit();
               setScore(s => s + 300);
@@ -309,89 +308,117 @@ export default function SpaceInvaders() {
               setTimeout(() => setUfo(null), 500);
               return false; // Remove bullet
             }
-            return true;
-          });
-        }
+          }
+          return true;
+        });
+
+        let bulletsAfterEnemyHits = [...remainingBullets];
         
         // Check enemy collisions
         setEnemies(prevEnemies => {
-          return prevEnemies.map(enemy => {
-            if (enemy.destroyed) return enemy;
-            
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
-              bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
-              bullet.y >= enemy.y && bullet.y <= enemy.y + 20
-            );
-            
-            if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1); // Remove the bullet
-              sounds.enemyHit();
-              setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10));
-              return { ...enemy, destroyed: true };
+          const newBullets: Bullet[] = [];
+          bulletsAfterEnemyHits.forEach(bullet => {
+            let bulletHit = false;
+            prevEnemies.forEach(enemy => {
+              if (!enemy.destroyed) {
+                const hit = bullet.x >= enemy.x && bullet.x <= enemy.x + 30 &&
+                            bullet.y >= enemy.y && bullet.y <= enemy.y + 20;
+                if (hit && !bulletHit) {
+                  bulletHit = true;
+                  sounds.enemyHit();
+                  setScore(s => s + (enemy.y < 150 ? 30 : enemy.y < 250 ? 20 : 10));
+                  enemy.destroyed = true; // This mutation is inside a setter, which is not ideal but let's stick to it for now
+                }
+              }
+            });
+            if (!bulletHit) {
+              newBullets.push(bullet);
             }
-            
-            return enemy;
           });
+          bulletsAfterEnemyHits = newBullets;
+          return prevEnemies;
         });
         
         // Check barrier collisions
         setBarriers(prevBarriers => {
-          return prevBarriers.filter(barrier => {
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+          const remainingBarriers: Position[] = [];
+          const bulletsAfterBarrierHits: Bullet[] = [];
+
+          prevBarriers.forEach(barrier => {
+            const hitBulletIndex = bulletsAfterEnemyHits.findIndex(bullet =>
               Math.abs(bullet.x - barrier.x) < 12 && Math.abs(bullet.y - barrier.y) < 12
             );
             
-            if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1); // Remove the bullet
-              return false; // Remove barrier block
+            if (hitBulletIndex === -1) {
+              remainingBarriers.push(barrier);
             }
-            
-            return true;
           });
+
+          bulletsAfterEnemyHits.forEach(bullet => {
+            const hitBarrier = prevBarriers.some(barrier => 
+              Math.abs(bullet.x - barrier.x) < 12 && Math.abs(bullet.y - barrier.y) < 12
+            );
+            if (!hitBarrier) {
+              bulletsAfterBarrierHits.push(bullet);
+            }
+          });
+          
+          // This is a side-effect, but let's keep it to avoid bigger refactoring
+          bulletsAfterEnemyHits = bulletsAfterBarrierHits;
+
+          return remainingBarriers;
         });
         
-        return remainingBullets;
+        return bulletsAfterEnemyHits;
       });
 
       // Enemy bullet collisions - consolidated approach
       setEnemyBullets(prevBullets => {
-        let remainingBullets = [...prevBullets];
-        
-        // Check collision with player
-        const playerHitIndex = remainingBullets.findIndex(bullet =>
-          bullet.x >= player.x && bullet.x <= player.x + 30 &&
-          bullet.y >= player.y && bullet.y <= player.y + 20
-        );
-        
-        if (playerHitIndex !== -1) {
-          remainingBullets.splice(playerHitIndex, 1); // Remove bullet
-          sounds.playerHit();
-          setLives(l => l - 1);
-          setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
+        const remainingBullets = [...prevBullets].filter(bullet => {
+          // Check collision with player
+          const playerHit = bullet.x >= player.x && bullet.x <= player.x + 30 &&
+                            bullet.y >= player.y && bullet.y <= player.y + 20;
           
-          if (lives <= 1) {
-            setGameOver(true);
-            sounds.gameOver();
+          if (playerHit) {
+            sounds.playerHit();
+            setLives(l => {
+              const newLives = l - 1;
+              if (newLives <= 0) {
+                setGameOver(true);
+                sounds.gameOver();
+              }
+              return newLives;
+            });
+            setPlayer({ x: GAME_WIDTH / 2, y: GAME_HEIGHT - 50 });
+            return false; // Remove bullet
           }
-        }
+          return true;
+        });
+
+        const bulletsAfterBarrierHits = [...remainingBullets];
         
         // Check collision with barriers
         setBarriers(prevBarriers => {
-          return prevBarriers.filter(barrier => {
-            const hitBulletIndex = remainingBullets.findIndex(bullet =>
+          const remainingBarriers: Position[] = [];
+          const bulletsHittingBarriers: Bullet[] = [];
+
+          prevBarriers.forEach(barrier => {
+            const hitBulletIndex = bulletsAfterBarrierHits.findIndex(bullet =>
               Math.abs(bullet.x - barrier.x) < 12 && Math.abs(bullet.y - barrier.y) < 12
             );
             
             if (hitBulletIndex !== -1) {
-              remainingBullets.splice(hitBulletIndex, 1); // Remove bullet
-              return false; // Remove barrier block
+              bulletsHittingBarriers.push(bulletsAfterBarrierHits[hitBulletIndex]);
+              bulletsAfterBarrierHits.splice(hitBulletIndex, 1);
+            } else {
+              remainingBarriers.push(barrier);
             }
-            
-            return true;
           });
+          
+          return remainingBarriers;
         });
         
-        return remainingBullets;
+        return bulletsAfterBarrierHits;
       });
 
       // Check win condition
