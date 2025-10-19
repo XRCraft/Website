@@ -5,10 +5,15 @@ export const metadata: Metadata = {
   description: 'Read the rules for playing on the XRCraftMC Minecraft Server.',
 };
 export default function RulesPage() {
-  // TODO: Add Discord rules when needed
-  // const discordrules = [
-  //   // todo
-  // ]
+  const discordRules = [
+    { id: 1, text: "No Graphic Content, This includes \"photos\" and suggestive imagery." },
+    { id: 2, text: "Do not Spam or Self Promote, This includes self-promoting, flooding, spam pinging, reaction flooding, and copy-pastas. Be mindful of Markdown usage." },
+    { id: 3, text: "No Hate Speech, Targeted hateful comments and rhetoric towards groups or attacking people for their traits is strictly prohibited." },
+    { id: 4, text: "Do not Attempt to Mute & Ban Evade, Doing so will cause both of your Discord accounts to be permanently banned. Do not ask others to share your messages, either." },
+    { id: 5, text: "Be respectful to everyone, Do not sexually harass, verbally harass, threaten, or attack anyone. Try not to start arguments with others or do things specifically to annoy people such as using a soundboard and trapping people in-game." },
+    { id: 6, text: "Do not share Pirated Content, Anything not sent by admins will be removed due to safety reasons and to follow Discord's terms. Pirated content includes full movies, torrented files, paid apks, ad free ones, (CRACKED), and ROMs." },
+    { id: 7, text: "Always follow Discord's Community Guidelines https://discord.com/terms/guidelines and Terms of Service https://discord.com/terms" },
+  ];
   const rules = [
     { id: 1, text: "No spamming of any type. This means no obnoxious noises, texts, or soundboards through ingame voicechat." },
     { id: 2, text: "No Advertisement. Any link, IP, or anything that may advertise another server, service, or anything will be heavily moderated." },
@@ -63,6 +68,17 @@ export default function RulesPage() {
                   {rule.tag}
                 </span>
               )}
+              {rule.text}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-4">Discord Rules</h2>
+        <ol className="list-decimal list-outside space-y-4 pl-10 ml-2">
+          {discordRules.map((rule) => (
+            <li key={rule.id} className="glass-light p-4">
               {rule.text}
             </li>
           ))}
