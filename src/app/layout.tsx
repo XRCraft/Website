@@ -6,9 +6,13 @@ import Navbar from "@/components/Navbar";
 import ClientSecretGame from "@/components/ClientSecretGame";
 import { inter, rubik, pressStart2P, vt323 } from './fonts';
 
-// Dynamically import components that aren't needed for initial page render
-const Footer = dynamic(() => import('@/components/Footer'), { ssr: true });
-const AnimatedLayout = dynamic(() => import('@/components/AnimatedLayout'), { ssr: true });
+// Dynamically import components with loading states
+const Footer = dynamic(() => import('@/components/Footer'), { 
+  loading: () => null 
+});
+const AnimatedLayout = dynamic(() => import('@/components/AnimatedLayout'), { 
+  loading: () => null 
+});
 
 // Viewport configuration
 export const viewport: Viewport = {
@@ -90,30 +94,6 @@ export default function RootLayout({
           enableSystem
           enableColorScheme={false}
         >
-          {/* Enhanced Minecraft particles effect with dynamic movement */}
-          <div className="particles" aria-hidden="true">
-            {Array.from({ length: 12 }).map((_, i) => {
-              const animationType = ['particle-drift', 'particle-pulse', 'particle-orbit'][i % 3];
-              const size = [1, 1.5, 2][i % 3];
-              return (
-                <div
-                  key={i}
-                  className="absolute bg-white rounded-full opacity-20"
-                  style={{
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    top: `${(Math.sin(i * 0.8) * 0.4 + 0.5) * 100}%`,
-                    left: `${(Math.cos(i * 0.9) * 0.4 + 0.5) * 100}%`,
-                    animation: `${animationType} ${8 + i % 6 * 2}s ease-in-out infinite`,
-                    animationDelay: `${i * 0.8}s`,
-                    willChange: 'transform, opacity',
-                    filter: i % 4 === 0 ? 'blur(0.5px)' : 'none'
-                  }}
-                />
-              );
-            })}
-          </div>
-          
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white">
             Skip to main content
           </a>

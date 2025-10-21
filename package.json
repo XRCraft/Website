@@ -12,7 +12,14 @@
     "type-check": "tsc --noEmit",
     "preview": "npm run build && npm run start"
   },
-  "keywords": ["minecraft", "vr", "questcraft", "xrcraft", "gaming", "next.js"],
+  "keywords": [
+    "minecraft",
+    "vr",
+    "questcraft",
+    "xrcraft",
+    "gaming",
+    "next.js"
+  ],
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "clsx": "^2.1.1",

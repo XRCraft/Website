@@ -46,11 +46,9 @@ body::before {
     radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
     url('/bgd.png') center center / cover no-repeat;
-  filter: blur(8px) brightness(0.9);
+  filter: blur(2px) brightness(0.9); /* Further reduced blur for better performance */
   opacity: 0.7;
   pointer-events: none;
-  will-change: transform;
-  animation: optimized-float 20s ease-in-out infinite;
   contain: strict;
 }
 
@@ -59,59 +57,11 @@ body::before {
   body::before {
     animation: none;
   }
-  
-  .particles {
-    display: none;
-  }
 }
 
-/* Ultra-fast keyframes - minimal transforms for 60fps performance */
-@keyframes optimized-float {
-  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  25% { transform: translate3d(0.1%, -0.05%, 0) rotate(0.1deg); }
-  50% { transform: translate3d(0.05%, 0.1%, 0) rotate(0deg); }
-  75% { transform: translate3d(-0.05%, 0.05%, 0) rotate(-0.1deg); }
-}
 
-@keyframes float {
-  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  25% { transform: translate3d(-2px, -3px, 0) scale(1.02); }
-  50% { transform: translate3d(2px, -2px, 0) scale(0.98); }
-  75% { transform: translate3d(-1px, 1px, 0) scale(1.01); }
-}
 
-/* Enhanced particle animations for more dynamic movement */
-@keyframes particle-drift {
-  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
-  25% { transform: translate3d(15px, -10px, 0) scale(1.1) rotate(90deg); }
-  50% { transform: translate3d(-5px, 20px, 0) scale(0.9) rotate(180deg); }
-  75% { transform: translate3d(-20px, -5px, 0) scale(1.05) rotate(270deg); }
-  100% { transform: translate3d(0, 0, 0) scale(1) rotate(360deg); }
-}
 
-@keyframes particle-pulse {
-  0%, 100% { opacity: 0.2; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.5); }
-}
-
-@keyframes particle-orbit {
-  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
-  25% { transform: translate3d(10px, 10px, 0) rotate(90deg); }
-  50% { transform: translate3d(0, 20px, 0) rotate(180deg); }
-  75% { transform: translate3d(-10px, 10px, 0) rotate(270deg); }
-  100% { transform: translate3d(0, 0, 0) rotate(360deg); }
-}
-
-@keyframes fast-pulse {
-  0%, 100% { transform: scale3d(1, 1, 1); }
-  50% { transform: scale3d(1.005, 1.005, 1); }
-}
-
-@keyframes obfuscated {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
 
 @media (prefers-color-scheme: light) {
   html {
@@ -130,7 +80,7 @@ body::before {
       radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 60%),
       radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 60%),
       url('/bgl.png') center center / cover no-repeat;
-    filter: blur(10px) brightness(1.1);
+    filter: blur(2px) brightness(1.1);
     opacity: 0.6;
   }
 }
@@ -200,44 +150,22 @@ body::before {
 .glass-container,
 .glass-light {
   border: 1px solid var(--border);
-  backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(8px) saturate(150%); /* Reduced blur */
   background: var(--surface);
   box-shadow: var(--shadow-md);
   border-radius: var(--border-radius);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease; /* Simplified transitions */
   position: relative;
   overflow: hidden;
   contain: layout style;
 }
 
 /* Enhanced glass effect overlay */
-.pixel-border::before,
-.glass-container::before,
-.glass-light::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.15) 0%, 
-    rgba(255, 255, 255, 0.05) 50%, 
-    transparent 100%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-/* Enhanced hover effects */
+/* Simplified hover effects for better performance */
 .pixel-border:hover,
 .glass-container:hover {
   border-color: var(--primary-light);
   background: var(--surface-hover);
-  box-shadow: var(--shadow-xl), var(--shadow-glow);
-  transform: translateY(-2px) scale(1.005);
-}
-
-.pixel-border:hover::before,
-.glass-container:hover::before {
-  opacity: 1;
 }
 
 /* Enhanced glass variants */
@@ -254,7 +182,7 @@ body::before {
   border: 1px solid var(--border-light);
   background: var(--surface-ultra-light);
   border-radius: var(--border-radius);
-  backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(6px) saturate(160%);
   box-shadow: var(--shadow-sm);
   transition: all 0.2s ease;
 }
@@ -262,8 +190,6 @@ body::before {
 .glass-light:hover {
   background: var(--surface-light);
   border-color: var(--border);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
 }
 
 /* Enhanced button system */
@@ -297,13 +223,12 @@ body::before {
 
 .mc-button:hover {
   background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-1px);
 }
 
 .glass-btn {
   background: var(--surface-light);
-  backdrop-filter: blur(12px) saturate(150%);
+  backdrop-filter: blur(6px) saturate(150%);
   border: 1px solid var(--border-light);
   color: var(--text-secondary);
 }
@@ -312,8 +237,6 @@ body::before {
   border-color: var(--primary-light);
   color: var(--primary-light);
   background: var(--surface-hover);
-  box-shadow: var(--shadow-lg), 0 0 15px rgba(59, 130, 246, 0.2);
-  transform: translateY(-1px) scale(1.01);
 }
 
 /* Focus and active states */
@@ -325,7 +248,7 @@ body::before {
 
 .mc-button:active,
 .glass-btn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(0);
   transition-duration: 0.1s;
 }
 
@@ -340,7 +263,6 @@ body::before {
 .mc-button:disabled:hover,
 .glass-btn:disabled:hover {
   transform: none;
-  box-shadow: var(--shadow-md);
 }
 
 /* Enhanced typography utilities */
@@ -414,30 +336,9 @@ body::before {
 }
 
 /* Performance optimizations */
-.gpu-accelerated {
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
 .smooth-scroll {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-}
-
-/* Optimized button transitions */
-.btn-optimized {
-  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
-}
-
-.btn-optimized:hover {
-  transform: translateY(-1px) scale(1.02);
-}
-
-.btn-optimized:active {
-  transform: translateY(0) scale(0.98);
-  transition-duration: 0.1s;
 }
 
 /* Navigation styles */
@@ -458,14 +359,12 @@ body::before {
   color: var(--primary-light);
   background: var(--surface-light);
   border-color: var(--border-light);
-  transform: translateY(-1px);
 }
 
 .glass-nav-link.active {
   color: var(--primary-light);
   background: var(--surface);
   border-color: var(--primary-light);
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
 }
 
 .glass-nav-link:focus {

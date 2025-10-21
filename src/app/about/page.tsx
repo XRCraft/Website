@@ -21,11 +21,11 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="glass-light p-4">
             <h3 className="font-semibold">Supported Versions:</h3>
-            <p>1.21.7 - 1.19.2</p>
+            <p>1.21.10 - 1.19.2</p>
           </div>
           <div className="glass-light p-4">
             <h3 className="font-semibold">Recommended Versions:</h3>
-            <p>1.21.7 - 1.21.1</p>
+            <p>1.21.10 - 1.21.4</p>
           </div>
         </div>
       </section>

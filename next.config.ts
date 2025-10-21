@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
+    reactRemoveProperties: process.env.NODE_ENV === "production",
+  },
+  
   // Enable image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -26,11 +31,15 @@ const nextConfig: NextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['@heroicons/react'],
+    optimizePackageImports: ['@heroicons/react', 'framer-motion'],
   },
   
-  // External packages optimization
-  serverExternalPackages: [],
+  // Optimize bundle size
+  modularizeImports: {
+    '@heroicons/react/24/outline': {
+      transform: '@heroicons/react/24/outline/{{member}}',
+    },
+  },
   
   // Compression and caching
   compress: true,

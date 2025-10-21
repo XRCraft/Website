@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import clsx from 'clsx'
@@ -17,36 +17,53 @@ const NAV_LINKS = [
   { href: '/socials', label: 'Socials' },
 ]
 
-export default function Navbar() {
+function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const pathname = usePathname()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false)
   }, [pathname])
 
-  // Add scroll effect
+  // Add scroll effect with throttling for better performance
   useEffect(() => {
+    if (!isMounted) return;
+
+    let timeoutId: NodeJS.Timeout;
     const handleScroll = () => {
-      const isScrolled = window.scrollY > 20;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        const isScrolled = window.scrollY > 20;
+        if (isScrolled !== scrolled) {
+          setScrolled(isScrolled);
+        }
+      }, 50); // Throttle to 50ms
     }
+
+    // Set initial state
+    handleScroll();
 
     // Use passive event listener for better performance
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [scrolled]);
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMounted, scrolled]);
 
   return (
     <nav
       role="navigation"
       className={clsx(
         'backdrop-blur-md sticky top-0 z-50 transition-all duration-300',
-        scrolled
+        scrolled && isMounted
           ? 'bg-white/10 shadow-lg border-b border-white/20'
           : 'bg-white/5 border-b border-white/10'
       )}
@@ -94,7 +111,7 @@ export default function Navbar() {
         <div className="md:hidden flex items-center">
           <button
             id="mobile-menu-button"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={useCallback(() => setIsMobileMenuOpen(!isMobileMenuOpen), [isMobileMenuOpen])}
             className={clsx(
               'glass-btn p-2',
               isMobileMenuOpen && 'active'
@@ -144,3 +161,5 @@ export default function Navbar() {
     </nav>
   )
 }
+
+export default memo(Navbar);

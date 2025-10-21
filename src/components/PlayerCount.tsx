@@ -32,15 +32,15 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
     `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
     fetcher, 
     {
-      refreshInterval: 120000, // Refresh every 2 minutes instead of every minute
+      refreshInterval: 180000, // Refresh every 3 minutes for better performance
       errorRetryCount: 2,
       revalidateOnFocus: false,
-      dedupingInterval: 60000, // Increased to reduce unnecessary fetches
+      dedupingInterval: 90000, // Increased to reduce unnecessary fetches
       onSuccess: () => setAnimate(true),
       suspense: false,
       keepPreviousData: true,
       revalidateIfStale: false, // Don't revalidate if data is stale for better performance
-      focusThrottleInterval: 30000, // Add throttling when tab focuses
+      focusThrottleInterval: 60000, // Increased throttling when tab focuses
       shouldRetryOnError: (err) => {
         // Only log in development
         if (process.env.NODE_ENV !== 'production') {

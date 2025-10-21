@@ -184,7 +184,7 @@ function parseMinecraftColors(text: string) {
 // Function to create a formatted demo MOTD based on your exact format
 function createExactDemoMotd() {
   return [
-    "§r§e§lXRCraft Network§r§c [1.21.8 - 1.18.2]",
+    "§r§e§lXRCraft Network§r§c [1.21.10 - 1.18.2]",
     "§r§o§r§r§c🎮§r§#FF5E55 §r§#FF6755P§r§#FF7055a§r§#FF7955r§r§#FF8255k§r§#FF8B55o§r§#FF9455u§r§#FF9D55r§r§#FFA655 §r§#FFAE55i§r§#FFB755s§r§#FFC055 §r§#FFC955o§r§#FFD255p§r§#FFDB55e§r§#FFE455n§r§#FFED55!§r§#FFF655 §r§e🎮§r"
   ];
 }
@@ -240,7 +240,7 @@ export default function ServerStatusClient() {
         online: false,
         motd: { raw: createExactDemoMotd() },
         players: { online: 0, max: 100, list: [] },
-        version: "1.21.8"
+        version: "1.21.10"
       }
     }
   );
@@ -538,7 +538,7 @@ export default function ServerStatusClient() {
         <div className="space-y-4">
           <div className="glass-light p-4 rounded">
             <h3 className="font-semibold">Supported Versions:</h3>
-            <p>1.21.8 - 1.19.2</p>
+            <p>1.21.10 - 1.19.2</p>
           </div>
           <div className="glass-light p-4 rounded">
             <h3 className="font-semibold">Recommended Mods:</h3>
