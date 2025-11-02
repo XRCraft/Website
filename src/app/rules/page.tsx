@@ -36,7 +36,7 @@ export default function RulesPage() {
     { id: 19, text: "Entity and item names must be suitable for players of all ages, i.e safe-for-work. Explicit names may be changed at any time by a staff member without warning or refunds."},
     { id: 20, tag: "SURVIVALIZED GAMEMODES", text: "No use of TNT dupers outside of farms. This includes griefing of any type" },
     { id: 21, tag: "SURVIVALIZED GAMEMODES", text: "Lava casts may be removed at any time. This does not mean they are disallowed, but they may be removed." },
-    { id: 22, tag: "SURVIVALIZED GAMEMODES", text: "No automatic AFK farms, you may be kicked and warned for using them." }
+    { id: 22, tag: "SURVIVALIZED GAMEMODES", text: "Do not automatically walk, or AFK walk."}
   ];
 
   return (
