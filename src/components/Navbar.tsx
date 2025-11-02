@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: '/servers', label: 'Servers' },
   { href: '/status', label: 'Server Status' },
   { href: '/socials', label: 'Socials' },
+  { href: '/staff', label: 'Staff' },
 ]
 
 function Navbar() {

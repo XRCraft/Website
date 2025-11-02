@@ -5,6 +5,7 @@ import { Metadata, Viewport } from 'next';
 import Navbar from "@/components/Navbar";
 import ClientSecretGame from "@/components/ClientSecretGame";
 import { inter, rubik, pressStart2P, vt323 } from './fonts';
+import ClientOnly from "@/components/ClientOnly";
 
 // Dynamically import components with loading states
 const Footer = dynamic(() => import('@/components/Footer'), { 
@@ -86,23 +87,32 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" as="style" href={inter.style.fontFamily} />
+        <link rel="preload" as="style" href={pressStart2P.style.fontFamily} />
+        <link rel="preload" as="style" href={rubik.style.fontFamily} />
+        <link rel="preload" as="style" href={vt323.style.fontFamily} />
       </head>
-      <body className="min-h-screen flex flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          enableColorScheme={false}
-        >
-          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white">
-            Skip to main content
-          </a>
-          <Navbar />
-          <main id="main-content" className="flex-grow container mx-auto px-4 pt-20 pb-8 w-full">
-            <AnimatedLayout>{children}</AnimatedLayout>
-          </main>
-          <Footer />
-        </ThemeProvider>
+      <body
+        className={`${inter.variable} ${pressStart2P.variable} ${rubik.variable} ${vt323.variable} bg-gray-900 text-white font-sans antialiased`}
+      >
+        <ClientOnly>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            enableColorScheme={false}
+          >
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white">
+              Skip to main content
+            </a>
+            <Navbar />
+            <main id="main-content" className="flex-grow container mx-auto px-4 pt-20 pb-8 w-full">
+              <AnimatedLayout>{children}</AnimatedLayout>
+            </main>
+            <Footer />
+          </ThemeProvider>
+        </ClientOnly>
         <ClientSecretGame />
       </body>
     </html>
