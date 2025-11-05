@@ -102,11 +102,6 @@ const staffMembers: StaffMember[] = [
         position: 'Moderator',
         imageUrl: 'https://minotar.net/helm/itanthon/128.png',
     },
-                {
-        name: 'Wha1es',
-        position: 'Moderator',
-        imageUrl: 'https://minotar.net/helm/wha1es/128.png',
-    },
                     {
         name: 'Yumitoo',
         position: 'Moderator',

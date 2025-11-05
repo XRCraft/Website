@@ -87,11 +87,6 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/logo.png" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preload" as="style" href={inter.style.fontFamily} />
-        <link rel="preload" as="style" href={pressStart2P.style.fontFamily} />
-        <link rel="preload" as="style" href={rubik.style.fontFamily} />
-        <link rel="preload" as="style" href={vt323.style.fontFamily} />
       </head>
       <body
         className={`${inter.variable} ${pressStart2P.variable} ${rubik.variable} ${vt323.variable} bg-gray-900 text-white font-sans antialiased`}
