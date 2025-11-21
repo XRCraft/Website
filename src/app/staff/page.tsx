@@ -1,5 +1,6 @@
 // src/app/staff/page.tsx
 import { Metadata } from 'next';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
     title: 'Staff',
@@ -126,9 +127,11 @@ export default function StaffPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {staffMembers.map((member) => (
                     <div key={member.name} className="bg-gray-800 rounded-lg p-6 text-center transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50">
-                        <img
+                        <Image
                             src={member.imageUrl}
                             alt={member.name}
+                            width={128}
+                            height={128}
                             className="w-32 h-32 rounded-full mx-auto mb-4"
                         />
                         <h2 className="text-2xl font-bold">{member.name}</h2>

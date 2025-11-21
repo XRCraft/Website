@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
         hostname: 'mc-heads.net',
         pathname: '/avatar/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'minotar.net',
+      },
     ],
   },
   
