@@ -190,7 +190,7 @@ export default function StaffClient() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4">
-                            {members.map((member, index) => (
+                            {members.map((member) => (
                                 <div 
                                     key={member.name} 
                                     className="glass-container group hover:scale-105 transition-all duration-300 flex flex-col items-center text-center p-6 relative overflow-hidden"
