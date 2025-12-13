@@ -141,6 +141,15 @@ export default function ServersPage() {
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-green-600 dark:text-green-400 font-semibold">Available</span>
                 </div>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    copyServerIP();
+                  }}
+                  className="glass-btn text-sm px-4 py-1.5 hover:scale-105 transition-transform active:scale-95"
+                >
+                  Join
+                </button>
               </div>
             </div>
           ))}

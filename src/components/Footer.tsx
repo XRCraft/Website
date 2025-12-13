@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import Image from 'next/image'
 import clsx from 'clsx'
+import { ArrowUpIcon } from '@heroicons/react/24/outline'
 
 // Footer links
 const FOOTER_LINKS = [
@@ -89,7 +90,7 @@ export default function Footer() {
       
       <div className="bg-mcbrown pixel-border pt-12 pb-16 shadow-xl relative z-10">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
             {/* About Section */}
             <div className="md:pr-6">
               <div className="flex items-center mb-4">
@@ -132,30 +133,6 @@ export default function Footer() {
               </div>
             </div>
             
-            {/* Quick Links */}
-            <nav aria-label="Quick Links">
-              <h3 className="text-lg font-semibold mb-4 pb-1 border-b-2 border-blue-400 pixel-font">Quick Links</h3>
-              <ul className="space-y-2 text-sm">
-                {FOOTER_LINKS.map((link) => (
-                  <li key={link.name}>
-                    <Link
-                      href={link.url}
-                      className="flex items-center hover:text-blue-300 transition-transform duration-200 transform hover:translate-x-2"
-                      aria-label={`Go to ${link.name} page`}
-                    >
-                      <span className="w-3 h-3 mr-2 inline-block" aria-hidden="true">
-                        {/* Arrow icon */}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
-                          <path d="M9 6L15 12L9 18" />
-                        </svg>
-                      </span>
-                      {link.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-            
             {/* Connect With Us */}
             <section aria-labelledby="social-heading">
               <h3 id="social-heading" className="text-lg font-semibold mb-4 pb-1 border-b-2 border-blue-400 pixel-font">Connect With Us</h3>
@@ -182,12 +159,39 @@ export default function Footer() {
       
       {/* Bottom grass border along with rights reserved text */}
       <div className="grass-block-bg" aria-hidden="true" />
-      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm text-white rounded-t-lg py-2 px-3 sm:px-4 md:px-6 text-center max-w-[95vw] sm:max-w-[90vw] w-auto shadow-lg border-2 border-white/10 border-b-0">
+      <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 z-10 bg-black/80 backdrop-blur-sm text-white rounded-t-lg py-2 px-3 sm:px-4 md:px-6 text-center max-w-[95vw] sm:max-w-[90vw] w-auto shadow-lg border-2 border-white/10 border-b-0 flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
         <div className="text-[7px] sm:text-xs">
           © {currentYear} XRCraftMC. All rights reserved. <br className="sm:hidden" />
           XRCraft is not affiliated with Mojang Studios or Microsoft.
         </div>
+        <button 
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="p-1.5 hover:bg-white/10 rounded-full transition-colors border border-white/10"
+          aria-label="Back to top"
+          title="Back to top"
+        >
+          <ArrowUpIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+        </button>
       </div>
+      
+      {/* Custom Ko-fi Widget to prevent document.write issues */}
+      <a 
+        href='https://ko-fi.com/B0B61GNCEG'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='fixed bottom-4 left-4 z-50 flex items-center gap-2 bg-[#72a4f2] text-white px-4 py-2 rounded-full shadow-lg hover:scale-105 transition-transform font-bold animate-bounce-slow'
+        style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.3)' }}
+      >
+        <div className="w-6 h-6 relative">
+          <Image 
+            src="https://storage.ko-fi.com/cdn/cup-border.png" 
+            alt="Ko-fi" 
+            fill
+            className="object-contain"
+          />
+        </div>
+        <span className="font-medium">Support us on Ko-fi</span>
+      </a>
     </footer>
   );
 }

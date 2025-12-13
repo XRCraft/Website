@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import PlayerCount from "@/components/PlayerCount";
 import Link from "next/link";
 import Image from "next/image";
+import Features from "@/components/Features";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 // Pre-generate static particle positions to avoid hydration mismatch
 // Using prime numbers to create less predictable patterns
@@ -157,8 +159,15 @@ export default function HomeClient() {
               </div>
             </div>
           </div>
+          
+          {/* Scroll Indicator */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <ChevronDownIcon className="h-8 w-8 text-white/70" />
+          </div>
         </div>
       </section>
+
+      <Features />
 
       {/* Info Sections */}
       <section 

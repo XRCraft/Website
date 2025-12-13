@@ -29,7 +29,7 @@ export default function PlayerCount({ serverIp }: { serverIp: string }) {
   }, [animate]);
 
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
+    `https://api.mcsrvstat.us/2/${encodeURIComponent(serverIp)}`, 
     fetcher, 
     {
       refreshInterval: 180000, // Refresh every 3 minutes for better performance

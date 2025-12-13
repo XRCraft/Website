@@ -219,7 +219,7 @@ export default function ServerStatusClient() {
   //   };
   // }, []);
   const { data, error, isLoading, mutate } = useSWR(
-    `/api/server-status?ip=${encodeURIComponent(serverIp)}`, 
+    `https://api.mcsrvstat.us/2/${encodeURIComponent(serverIp)}`, 
     fetcher, 
     {
       refreshInterval: 30000, // Refresh every 30 seconds

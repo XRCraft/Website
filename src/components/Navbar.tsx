@@ -6,6 +6,7 @@ import Image from 'next/image'
 import clsx from 'clsx'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { usePathname } from 'next/navigation'
+import PlayerCount from './PlayerCount'
 
 // Extracted navigation links
 const NAV_LINKS = [
@@ -106,6 +107,15 @@ function Navbar() {
               </Link>
             </li>
           ))}
+          
+          {/* Player Count Badge */}
+          <li className="ml-2 hidden lg:block">
+             <div className="flex items-center bg-black/40 px-3 py-1.5 rounded-md pixel-border border-white/10 hover:bg-black/60 transition-colors">
+                <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                <span className="text-xs text-gray-300 mr-2 font-mono">ONLINE:</span>
+                <PlayerCount serverIp="play.xrcraftmc.com" />
+             </div>
+          </li>
         </ul>
 
         {/* Mobile Menu Button */}
@@ -157,6 +167,13 @@ function Navbar() {
               </Link>
             </li>
           ))}
+          <li className="flex justify-center py-2">
+             <div className="flex items-center bg-black/40 px-4 py-2 rounded-md pixel-border border-white/10">
+                <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                <span className="text-xs text-gray-300 mr-2 font-mono">ONLINE:</span>
+                <PlayerCount serverIp="play.xrcraftmc.com" />
+             </div>
+          </li>
         </ul>
       </div>
     </nav>
