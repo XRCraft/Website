@@ -1,19 +1,9 @@
 'use client';
-import Link from 'next/link'
 import { useState } from 'react'
 import Image from 'next/image'
 import clsx from 'clsx'
 import { ArrowUpIcon } from '@heroicons/react/24/outline'
 
-// Footer links
-const FOOTER_LINKS = [
-  { name: 'Home', url: '/' },
-  { name: 'About', url: '/about' },
-  { name: 'Rules', url: '/rules' },
-  { name: 'Servers', url: '/servers' },
-  { name: 'Status', url: '/status' },
-  { name: 'Socials', url: '/socials' }
-]
 const SOCIAL_LINKS = [
   { 
     name: 'Discord', 
