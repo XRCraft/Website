@@ -1,7 +1,7 @@
 {
   "name": "xrcraftmc-website",
   "version": "1.0.0",
-  "description": "A modern, performance-optimized website for the XRCraft VR Minecraft server",
+  "description": "A modern website for the XRCraft VR Minecraft server",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 4050",
@@ -17,8 +17,7 @@
     "vr",
     "questcraft",
     "xrcraft",
-    "gaming",
-    "next.js"
+    "gaming"
   ],
   "dependencies": {
     "@heroicons/react": "^2.2.0",
