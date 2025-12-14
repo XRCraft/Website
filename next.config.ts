@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   },
   
   // Enable static export for GitHub Pages
-  output: 'export',
+  // output: 'export',
 
   // Enable image optimization
   images: {
