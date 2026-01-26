@@ -36,7 +36,8 @@ export default function RulesPage() {
     { id: 19, text: "Entity and item names must be suitable for players of all ages, i.e safe-for-work. Explicit names may be changed at any time by a staff member without warning or refunds."},
     { id: 20, tag: "SURVIVALIZED GAMEMODES", text: "No use of TNT dupers outside of farms. This includes griefing of any type" },
     { id: 21, tag: "SURVIVALIZED GAMEMODES", text: "Lava casts may be removed at any time. This does not mean they are disallowed, but they may be removed." },
-    { id: 22, tag: "SURVIVALIZED GAMEMODES", text: "Do not automatically walk, or AFK walk."}
+    { id: 22, tag: "SURVIVALIZED GAMEMODES", text: "Do not automatically walk, or AFK walk."},
+    { id: 23, tag: "SURVIVALIZED GAMEMODES", text: "Do not push enderman into the end portal." },
   ];
 
   return (
@@ -47,9 +48,8 @@ export default function RulesPage() {
         <h2 className="text-xl font-semibold text-yellow-600 dark:text-yellow-400 mb-2">Important Notes</h2>
         <ul className="list-disc list-inside space-y-1 text-yellow-600 dark:text-yellow-300">
           <li>Rules may be updated at any time. Check back regularly. Pleading ignorance is not a valid excuse.</li>
-          <li>Some rules only apply to specific gamemodes and are tagged accordingly (e.g., <span className="font-mono bg-gray-200 dark:bg-gray-700 px-1 rounded">(GAMEMODE)</span>).</li>
+          <li>Some rules only apply to specific gamemodes and are tagged accordingly.</li>
           <li>Use common sense. If something seems unfair or is banned on most servers, it will likely banned here.</li>
-          <li>Staff are available to clarify rules.</li>
         </ul>
       </section>
       
