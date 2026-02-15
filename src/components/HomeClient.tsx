@@ -181,7 +181,7 @@ export default function HomeClient() {
               What is XRCraft?
             </h2>
             <p className="mb-4 text-white">
-              XRCraft is a VR optimized Minecraft server that iss included in QuestCraft by default, 
+              XRCraft is a VR optimized Minecraft server that is included in QuestCraft by default, 
               providing the best experience for VR players while remaining fully compatible with PC!
             </p>
             <p className="mb-6 text-white">
