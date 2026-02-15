@@ -14,7 +14,7 @@ export default function TermsPage() {
       <section className="glass-container p-6 rounded-lg shadow-md bg-white/50 dark:bg-black/30 backdrop-blur-md">
         <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">1. Acceptance of Terms</h2>
         <p className="mb-4 text-gray-600 dark:text-gray-300">
-          By accessing or using the XRCraftMC website, Minecraft server, or Discord community (collectively, the "Services"), you agree to be bound by these Terms of Use ("Terms"). If you do not agree to these Terms, please do not use our Services.
+          By accessing or using the XRCraftMC website, Minecraft server, or Discord community (collectively, the &quot;Services&quot;), you agree to be bound by these Terms of Use (&quot;Terms&quot;). If you do not agree to these Terms, please do not use our Services.
         </p>
         <p className="text-gray-600 dark:text-gray-300">
           These Terms apply to all visitors, users, and others who access or use the Service. Any individuals who have already joined or participated in the community are considered to have already agreed to these terms.
@@ -82,7 +82,7 @@ export default function TermsPage() {
       <section className="glass-container p-6 rounded-lg shadow-md bg-white/50 dark:bg-black/30 backdrop-blur-md">
         <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">8. Administration</h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Administrators of XRCraftMC reserve the right to interpret these rules and terms at their own discretion. Staff members may take any action they deem necessary to maintain the server environment, including but not limited to banning, muting, or removing players and content for any reason, or no reason at all. "Admin abuse" is expressly permitted as a prerogative of the administration team.
+          Administrators of XRCraftMC reserve the right to interpret these rules and terms at their own discretion. Staff members may take any action they deem necessary to maintain the server environment, including but not limited to banning, muting, or removing players and content for any reason, or no reason at all. &quot;Admin abuse&quot; is expressly permitted as a prerogative of the administration team.
         </p>
       </section>
 
