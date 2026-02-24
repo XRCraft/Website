@@ -38,6 +38,7 @@ export default function RulesPage() {
     { id: 21, tag: "SURVIVALIZED GAMEMODES", text: "Lava casts may be removed at any time. This does not mean they are disallowed, but they may be removed." },
     { id: 22, tag: "SURVIVALIZED GAMEMODES", text: "Do not automatically walk, or AFK walk."},
     { id: 23, tag: "SURVIVALIZED GAMEMODES", text: "Do not push enderman into the end portal." },
+    { id: 24, text: "No edgy jokes such as those which may involve any topic that isn't appropriate for people under 16."}
   ];
 
   return (
