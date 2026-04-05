@@ -191,32 +191,12 @@ function createExactDemoMotd() {
 export default function ServerStatusClient() {
   const serverIp = "play.xrcraftmc.com";
   const [,setRetryCount] = useState(0); 
-  const [showRawMotd, setShowRawMotd] = useState(false);
+  const [showRawMotd, setShowRawMotd] = useState(false); //TODO: remove this after removing the rest
   const [copiedHeader, setCopiedHeader] = useState(false);
   const [copiedJoin, setCopiedJoin] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date);
   
-  // TODO: Add network connectivity monitoring
-  // const [isOnline] = useState(navigator?.onLine ?? true);
-  
-  // TODO: Implement network connectivity monitoring
-  // useEffect(() => {
-  //   const handleOnline = () => {
-  //     // TODO: Refresh data when connection is restored
-  //   };
-  //   const handleOffline = () => {
-  //     // TODO: Show offline indicator
-  //   };
-
-  //   window.addEventListener('online', handleOnline);
-  //   window.addEventListener('offline', handleOffline);
-    
-  //   return () => {
-  //     window.removeEventListener('online', handleOnline);
-  //     window.removeEventListener('offline', handleOffline);
-  //   };
-  // }, []);
   const { data, error, isLoading, mutate } = useSWR(
     `https://api.mcsrvstat.us/2/${encodeURIComponent(serverIp)}`, 
     fetcher, 
@@ -436,13 +416,6 @@ export default function ServerStatusClient() {
                     className="glass-btn text-sm mr-4"
                   >
                     Show in-game preview
-                  </button>
-                  
-                  <button 
-                    onClick={() => setShowRawMotd(!showRawMotd)}
-                    className="glass-btn text-sm"
-                  >
-                    {showRawMotd ? 'Show formatted MOTD' : 'Show raw format'}
                   </button>
                   
                   <div id="minecraft-motd-preview" className="hidden mt-3 p-4 glass-container text-white rounded overflow-hidden max-w-md mx-auto">
