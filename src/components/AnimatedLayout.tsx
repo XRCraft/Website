@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useState, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 
 export default function AnimatedLayout({ children }: { children: ReactNode }) {
@@ -23,7 +23,7 @@ export default function AnimatedLayout({ children }: { children: ReactNode }) {
   }, []);
 
   // Optimized variants with reduced motion support - memoized
-  const variants = useMemo(() => reducedMotion ? {
+  const variants = useMemo<Variants>(() => reducedMotion ? {
     // Simple fade for reduced motion
     hidden: { opacity: 0 },
     visible: { 
@@ -43,14 +43,14 @@ export default function AnimatedLayout({ children }: { children: ReactNode }) {
       opacity: 1,
       transition: { 
         duration: 0.15,
-        ease: 'easeOut'
+        ease: 'easeOut' as const
       }
     },
     exit: { 
       opacity: 0,
       transition: {
         duration: 0.1,
-        ease: 'easeIn'
+        ease: 'easeIn' as const
       }
     }
   }, [reducedMotion]);

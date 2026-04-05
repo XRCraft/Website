@@ -1,6 +1,6 @@
 'use client';
 
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 
@@ -191,7 +191,6 @@ function createExactDemoMotd() {
 export default function ServerStatusClient() {
   const serverIp = "play.xrcraftmc.com";
   const [,setRetryCount] = useState(0); 
-  const [showRawMotd, setShowRawMotd] = useState(false); //TODO: remove this after removing the rest
   const [copiedHeader, setCopiedHeader] = useState(false);
   const [copiedJoin, setCopiedJoin] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -384,24 +383,16 @@ export default function ServerStatusClient() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Message of the Day</h3>
                 <div className="glass-light p-3 rounded font-minecraft overflow-hidden">
-                  {showRawMotd ? (
-                    <div className="leading-tight text-xs font-mono overflow-x-auto whitespace-pre">
-                      {getMotdLines().map((line: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | null | undefined> | null | undefined, idx: Key | null | undefined) => (
-                        <div key={idx}>{line}</div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="leading-tight">
-                      {getMotdLines().map((line: string, idx: number) => (
-                        <div 
-                          key={idx} 
-                          dangerouslySetInnerHTML={{ 
-                            __html: parseMinecraftColors(line)
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <div className="leading-tight">
+                    {getMotdLines().map((line: string, idx: number) => (
+                      <div 
+                        key={idx} 
+                        dangerouslySetInnerHTML={{ 
+                          __html: parseMinecraftColors(line)
+                        }}
+                      />
+                    ))}
+                  </div>
                 </div>
                 
                 {/* Add a button to show what this would look like in-game */}
